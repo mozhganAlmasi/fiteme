@@ -1,0 +1,58 @@
+import 'package:bloc/bloc.dart';
+import 'package:meta/meta.dart';
+import 'package:shahrzad/repositories/size_repository.dart';
+
+import '../../models/size_model.dart';
+
+part 'sizes_event.dart';
+part 'sizes_state.dart';
+
+class SizesBloc extends Bloc<SizesEvent, SizesState> {
+  SizesBloc() : super(SizesInitial()) {
+    on<SizesEvent>((event, emit) {
+      // TODO: implement event handler
+    });
+    on<LoadingSize>((event, emit) async {
+      try {
+        emit(SizeLoading());
+      } catch (e) {
+        emit(SizeFail(e.toString()));
+      }
+    });
+
+    on<CreateSize>((event, emit) async {
+      try {
+        await SizeRepository.createSize(event.Size);
+        emit(SizeCreateSuccess());
+      } catch (e) {
+        emit(SizeFail(e.toString()));
+      }
+    });
+
+    on<LoadSizes>((event, emit) async {
+      try {
+        emit(SizeLoading());
+        List<SizeModel> result =  await SizeRepository.fetchSize(event.userID);
+        if(result.length ==0) {
+          emit(SizeEmpty());
+        }else{
+          emit(SizeLoadSuccess(result));
+        }
+
+      } catch (e) {
+        emit(SizeFail(e.toString()));
+      }
+    });
+
+    on<DeleteSize>((event , emit) async{
+      try{
+        await SizeRepository.deletSize(event.userID, event.rowID);
+        emit(SizeDeletSuccess(event.rowID));
+      }catch(e){
+        emit(SizeFail(e.toString()));
+      }
+    });
+
+
+  }
+}
