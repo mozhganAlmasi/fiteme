@@ -23,12 +23,8 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscureText = false;
   bool _userLoading = false;
+  bool internetDisconnect = false;
 
-  @override
-  void initState() {
-    super.initState();
-    context.read<ConnectivityBloc>().add(CheckConnectivity());
-  }
 
   @override
   void dispose() {
@@ -39,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool internetDisconnect = false;
+
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
@@ -79,7 +75,9 @@ class _LoginPageState extends State<LoginPage> {
             BlocListener<ConnectivityBloc, ConnectivityState>(
               listener: (context, state) {
                 if (state is ConnectivityDisconnected) {
-                  internetDisconnect = true;
+                  setState(() {
+                    internetDisconnect = true;
+                  });
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('اتصال به اینترنت برقرار نیست') ,
@@ -87,7 +85,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   );
                 } else if (state is ConnectivityConnected) {
-                  internetDisconnect = false;
+                  setState(() {
+                    internetDisconnect = false;
+                  });
+
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('اتصال به اینترنت برقرار شد') ,
@@ -170,35 +171,35 @@ class _LoginPageState extends State<LoginPage> {
                                 const SizedBox(height: 40),
                                 Container(
                                   width: double.infinity,
-                                  child: ElevatedButton(
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 32, vertical: 18),
-                                      backgroundColor: mzhColorThem1[9],
-                                      foregroundColor: mzhColorThem1[2],
-                                      side: BorderSide(color: mzhColorThem1[2]),
-                                    ),
-                                    onPressed: () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        final phone = _phoneController.text.trim();
-                                        final pass = _passwordController.text.trim();
-
-                                        context.read<ConnectivityBloc>().add(CheckConnectivity());
-                                        if (internetDisconnect) {
-                                          return;
+                                  child: BlocSelector<ConnectivityBloc, ConnectivityState, bool>(
+                                    selector: (state) => state is ConnectivityConnected,
+                                    builder: (context, isConnected) {
+                                      return ElevatedButton(
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+                                          backgroundColor: mzhColorThem1[9],
+                                          foregroundColor: mzhColorThem1[2],
+                                          side: BorderSide(color: mzhColorThem1[2]),
+                                        ),
+                                        onPressed: isConnected
+                                            ? () {
+                                          if (_formKey.currentState!.validate()) {
+                                            final phone = _phoneController.text.trim();
+                                            final pass = _passwordController.text.trim();
+                                            context.read<UsersBloc>().add(LoginSubmittedEvent(
+                                              phoneNumber: phone,
+                                              password: pass,
+                                            ));
+                                          }
                                         }
-                                        context.read<UsersBloc>().add(LoginSubmittedEvent(
-                                          phoneNumber: phone,
-                                          password: pass,
-                                        ));
-                                      }
-
+                                            : null,
+                                        child: (_userLoading)
+                                            ? CircularProgressIndicator()
+                                            : Text("ورود", style: CustomTextStyle.textbutton),
+                                      );
                                     },
-                                    child: (_userLoading)
-                                        ? CircularProgressIndicator()
-                                        : Text("ورود",
-                                            style: CustomTextStyle.textbutton),
                                   ),
+
                                 ),
                                 SizedBox(
                                   height: 20,
