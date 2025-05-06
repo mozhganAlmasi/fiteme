@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shahrzad/blocs/size/sizes_bloc.dart';
 import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
-import 'package:shahrzad/classes/shake_animation.dart';
+import 'package:shahrzad/widgets/shake_animation.dart';
 import 'package:shahrzad/classes/style.dart';
 import 'package:shahrzad/widgets/privacypolicydialog.dart';
 import 'package:shahrzad/widgets/customalertdialog.dart';
@@ -266,27 +266,21 @@ class _AddsizePageState extends State<AddsizePage> {
                                             ];
                                           });
                                           if (isValid){
-                                            if (!_isPolicyAccepted) {
-                                              _isPolicyAccepted =
-                                              await showPrivacyPolicyDialog(
-                                                  context);
-                                            } else {
-                                              SizeModel size = SizeModel(
-                                                id: 0, // در سرور به‌صورت UUID ساخته میشه، پس اینجا خالی بذار
-                                                waist: double.parse(waistController.text),
-                                                chest: double.parse(chestController.text),
-                                                hips: double.parse(hipsController.text),
-                                                arm: double.parse(armController.text),
-                                                thigh: double.parse(thighController.text),
-                                                shoulder: double.parse(shoulderController.text),
-                                                belly: double.parse(bellyController.text),
-                                                dateInsert: selectedYear.toString()+"/" +selectedMonth,
-                                                userId: widget.userID, // مقدار مورد نظر شما
-                                              );
-                                              context
-                                                  .read<SizesBloc>()
-                                                  .add(CreateSize(size));
-                                            }
+                                            SizeModel size = SizeModel(
+                                              id: 0, // در سرور به‌صورت UUID ساخته میشه، پس اینجا خالی بذار
+                                              waist: double.parse(waistController.text),
+                                              chest: double.parse(chestController.text),
+                                              hips: double.parse(hipsController.text),
+                                              arm: double.parse(armController.text),
+                                              thigh: double.parse(thighController.text),
+                                              shoulder: double.parse(shoulderController.text),
+                                              belly: double.parse(bellyController.text),
+                                              dateInsert: selectedYear.toString()+"/" +selectedMonth,
+                                              userId: widget.userID, // مقدار مورد نظر شما
+                                            );
+                                            context
+                                                .read<SizesBloc>()
+                                                .add(CreateSize(size));
                                           }
 
                                         },

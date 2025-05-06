@@ -16,7 +16,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     on<LoadUsersEvent>((event, emit) async {
       emit(UserLoading());
       try {
-        final users = await UserRepository.fetchUsers();
+        final users = await UserRepository.getAllUsers();
         emit(UserLoaded(users));
       } catch (e) {
         emit(UserError(e.toString()));
@@ -59,6 +59,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     });
     on<LoginSubmittedEvent>((event, emit) async {
       try {
+        emit(UserLoading());
         var result =await UserRepository.login(event.phoneNumber ,event.password);
         if(result["success"] == true)
           {

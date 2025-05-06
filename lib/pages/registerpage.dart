@@ -6,6 +6,7 @@ import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
 import 'package:shahrzad/pages/loginpage.dart';
 import 'package:shahrzad/widgets/customalertdialog.dart';
+import 'package:shahrzad/widgets/shake_animation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../blocs/size/sizes_bloc.dart';
 import '../models/user_model.dart';
@@ -30,6 +31,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isPolicyAccepted = false;
   String? selectedGroup;
   int selectedIndex = 1;
+  List<bool> fieldErrors = [false, false, false, false, false];
 
   final List<String> lstGroupname = [
     'ایروبیک',
@@ -81,7 +83,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
-                          create: (context) => SizesBloc()..add(LoadSizes(state.userID)),
+                          create: (context) =>
+                              SizesBloc()..add(LoadSizes(state.userID)),
                           child: HomePage(userID: state.userID),
                         ),
                       ),
@@ -126,17 +129,23 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                TextField(
-                                  controller: _nameController,
-                                  decoration: const InputDecoration(
-                                    labelText: ' نام',
+                                ShakeWidget(
+                                  shake: fieldErrors[0],
+                                  child: TextFormField(
+                                    controller: _nameController,
+                                    decoration: const InputDecoration(
+                                      labelText: ' نام',
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                TextField(
-                                  controller: _famiyController,
-                                  decoration: const InputDecoration(
-                                    labelText: ' نام خانوادگی',
+                                ShakeWidget(
+                                  shake: fieldErrors[1],
+                                  child: TextFormField(
+                                    controller: _famiyController,
+                                    decoration: const InputDecoration(
+                                      labelText: ' نام خانوادگی',
+                                    ),
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -189,56 +198,65 @@ class _RegisterPageState extends State<RegisterPage> {
                                 SizedBox(
                                   height: 20,
                                 ),
-                                TextFormField(
-                                  controller: _phonenumberController,
-                                  keyboardType: TextInputType.phone,
-                                  decoration: InputDecoration(
-                                    labelText: 'شماره موبایل',
-                                    border: OutlineInputBorder(),
+                                ShakeWidget(
+                                  shake: fieldErrors[2],
+                                  child: TextFormField(
+                                    controller: _phonenumberController,
+                                    keyboardType: TextInputType.phone,
+                                    decoration: InputDecoration(
+                                      labelText: 'شماره موبایل',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'شماره موبایل را وارد کنید';
+                                      } else if (!RegExp(r'^0\d{10}$')
+                                          .hasMatch(value)) {
+                                        return 'شماره موبایل باید با ۰ شروع شود و ۱۱ رقم باشد';
+                                      }
+                                      return null;
+                                    },
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'شماره موبایل را وارد کنید';
-                                    } else if (!RegExp(r'^0\d{10}$')
-                                        .hasMatch(value)) {
-                                      return 'شماره موبایل باید با ۰ شروع شود و ۱۱ رقم باشد';
-                                    }
-                                    return null;
-                                  },
                                 ),
                                 const SizedBox(height: 20),
-                                TextFormField(
-                                  controller: _passwordController,
-                                  obscureText: !_obscureText,
-                                  decoration: InputDecoration(
-                                    labelText: 'رمز عبور',
-                                    border: OutlineInputBorder(),
+                                ShakeWidget(
+                                  shake: fieldErrors[3],
+                                  child: TextFormField(
+                                    controller: _passwordController,
+                                    obscureText: !_obscureText,
+                                    decoration: InputDecoration(
+                                      labelText: 'رمز عبور',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'رمز عبور را وارد کنید';
+                                      } else if (value.length < 5) {
+                                        return 'رمز عبور باید حداقل ۵ کاراکتر باشد';
+                                      }
+                                      return null;
+                                    },
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'رمز عبور را وارد کنید';
-                                    } else if (value.length < 5) {
-                                      return 'رمز عبور باید حداقل ۵ کاراکتر باشد';
-                                    }
-                                    return null;
-                                  },
                                 ),
                                 const SizedBox(height: 20),
-                                TextFormField(
-                                  controller: _repasswordController,
-                                  obscureText: !_obscureText,
-                                  decoration: InputDecoration(
-                                    labelText: ' تکرار رمز عبور',
-                                    border: OutlineInputBorder(),
+                                ShakeWidget(
+                                  shake: fieldErrors[4],
+                                  child: TextFormField(
+                                    controller: _repasswordController,
+                                    obscureText: !_obscureText,
+                                    decoration: InputDecoration(
+                                      labelText: ' تکرار رمز عبور',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'رمز عبور را وارد کنید';
+                                      } else if (value.length < 5) {
+                                        return 'رمز عبور باید حداقل ۵ کاراکتر باشد';
+                                      }
+                                      return null;
+                                    },
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'رمز عبور را وارد کنید';
-                                    } else if (value.length < 5) {
-                                      return 'رمز عبور باید حداقل ۵ کاراکتر باشد';
-                                    }
-                                    return null;
-                                  },
                                 ),
                                 const SizedBox(height: 40),
                                 Container(
@@ -255,11 +273,22 @@ class _RegisterPageState extends State<RegisterPage> {
                                               color: mzhColorThem1[2]),
                                         ),
                                         onPressed: () async {
+                                          bool isValid =
+                                              _formKey.currentState!.validate();
+                                          setState(() {
+                                            fieldErrors = [
+                                              _nameController.text.isEmpty,
+                                              _famiyController.text.isEmpty,
+                                              _phonenumberController.text.isEmpty,
+                                              _passwordController.text.isEmpty,
+                                              _repasswordController.text.isEmpty,
+                                            ];
+                                          });
                                           if (!_isPolicyAccepted) {
                                             _isPolicyAccepted =
                                                 await showPrivacyPolicyDialog(
                                                     context);
-                                          } else {
+                                          } else if(isValid){
                                             UserModel user = UserModel(
                                                 name: _nameController.text,
                                                 family: _famiyController.text,
@@ -292,11 +321,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                           Navigator.of(context).pushReplacement(
                                             MaterialPageRoute(
                                                 builder: (_) => BlocProvider(
-                                                  create: (context) => UsersBloc(),
-                                                  child:  LoginPage(),
-                                                )),
+                                                      create: (context) =>
+                                                          UsersBloc(),
+                                                      child: LoginPage(),
+                                                    )),
                                           );
-
                                         },
                                         child: Text("بازگشت",
                                             style: CustomTextStyle.textbutton),
