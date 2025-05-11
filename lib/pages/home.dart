@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   )));
     } else if (value == 'manag_users') {
-      Navigator.pushReplacement(
+      Navigator.push(
           context,
           MaterialPageRoute(
               builder: (_) => BlocProvider(

@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shahrzad/blocs/size/sizes_bloc.dart';
@@ -10,6 +9,8 @@ import 'package:shahrzad/pages/registerpage.dart';
 import '../blocs/internetconnection/connectivity_bloc.dart';
 import '../cubit/userinfo_cubit.dart';
 import '../widgets/customalertdialog.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -75,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
                 }
               },
             ),
-            BlocListener<ConnectivityBloc, ConnectivityState>(
+            if (!kIsWeb)  BlocListener<ConnectivityBloc, ConnectivityState>(
               listener: (context, state) {
                 if (state is ConnectivityDisconnected) {
                   setState(() {
@@ -174,7 +175,29 @@ class _LoginPageState extends State<LoginPage> {
                                 const SizedBox(height: 40),
                                 Container(
                                   width: double.infinity,
-                                  child: BlocSelector<ConnectivityBloc, ConnectivityState, bool>(
+                                  child: kIsWeb
+                                      ? ElevatedButton(
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+                                      backgroundColor: mzhColorThem1[9],
+                                      foregroundColor: mzhColorThem1[2],
+                                      side: BorderSide(color: mzhColorThem1[2]),
+                                    ),
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        final phone = _phoneController.text.trim();
+                                        final pass = _passwordController.text.trim();
+                                        context.read<UsersBloc>().add(LoginSubmittedEvent(
+                                          phoneNumber: phone,
+                                          password: pass,
+                                        ));
+                                      }
+                                    },
+                                    child: (_userLoading)
+                                        ? CircularProgressIndicator()
+                                        : Text("ورود", style: CustomTextStyle.textbutton),
+                                  )
+                                      :  BlocSelector<ConnectivityBloc, ConnectivityState, bool>(
                                     selector: (state) => state is ConnectivityConnected,
                                     builder: (context, isConnected) {
                                       return ElevatedButton(
@@ -249,3 +272,5 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+
