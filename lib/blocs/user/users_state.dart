@@ -3,33 +3,34 @@ part of 'users_bloc.dart';
 @immutable
 sealed class UsersState {}
 
-final class UsersInitial extends UsersState {}
+final class UsersInitialState extends UsersState {}
 
-class UserLoading extends UsersState {}
+class UserLoadingState extends UsersState {}
 
-class UserLoaded extends UsersState {
+class UserLoadedState extends UsersState {
   final List<UserModel> users;
-  UserLoaded(this.users);
+  UserLoadedState(this.users);
 }
-class GetUserSuccess extends UsersState {
+class GetUserSuccessState extends UsersState {
   UserModel user;
-  GetUserSuccess(this.user);
+  GetUserSuccessState(this.user);
 }
-class DeletUserSuccess extends UsersState {
+class DeletUserSuccessState extends UsersState {
 }
-class UpdateUserSuccess extends UsersState {
+class UpdateUserSuccessState extends UsersState {
 }
-class UserLoginSuccess extends UsersState {
+class UserLoginSuccessState extends UsersState {
   final String userID ;
-  UserLoginSuccess(this.userID);
+  final int userRole;
+  UserLoginSuccessState(this.userID , this.userRole);
 }
-class UserLoginFail extends UsersState {
+class UserLoginFailState extends UsersState {
 }
-class UserCreateSuccess extends UsersState {
+class UserCreateSuccessState extends UsersState {
   final String userID ;
-  UserCreateSuccess(this.userID);
+  UserCreateSuccessState(this.userID);
 }
-class UserError extends UsersState {
+class UserErrorState extends UsersState {
   final String message;
-  UserError(this.message);
+  UserErrorState(this.message);
 }

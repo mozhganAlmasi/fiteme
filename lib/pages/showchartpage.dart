@@ -104,7 +104,7 @@ class ShowChartPage extends StatelessWidget {
                         builder: (_) => BlocProvider(
                               create: (context) =>
                                   SizesBloc()..add(LoadSizes(userID)),
-                              child: HomePage(userID: userID),
+                              child: HomePage(),
                             )));
               },
               child: Text("بازگشت", style: CustomTextStyle.textbutton),

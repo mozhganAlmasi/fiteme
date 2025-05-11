@@ -9,67 +9,67 @@ part 'users_state.dart';
 
 class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
-  UsersBloc() : super(UsersInitial()) {
+  UsersBloc() : super(UsersInitialState()) {
     on<UsersEvent>((event, emit) {
       // TODO: implement event handler
     });
     on<LoadUsersEvent>((event, emit) async {
-      emit(UserLoading());
+      emit(UserLoadingState());
       try {
         final users = await UserRepository.getAllUsers();
-        emit(UserLoaded(users));
+        emit(UserLoadedState(users));
       } catch (e) {
-        emit(UserError(e.toString()));
+        emit(UserErrorState(e.toString()));
       }
     });
-    on<GetUser>((event, emit) async {
-      emit(UserLoading());
+    on<GetUserEvant>((event, emit) async {
+      emit(UserLoadingState());
       try {
         final users = await UserRepository.getUser(event.userID);
-        emit(GetUserSuccess(users));
+        emit(GetUserSuccessState(users));
       } catch (e) {
-        emit(UserError(e.toString()));
+        emit(UserErrorState(e.toString()));
       }
     });
     on<CreateUserEvent>((event, emit) async {
       try {
         final userID= await UserRepository.createUser(event.user);
-        emit(UserCreateSuccess(userID));
+        emit(UserCreateSuccessState(userID));
       } catch (e) {
-        emit(UserError(e.toString()));
+        emit(UserErrorState(e.toString()));
       }
     });
 
     on<UpdateUserEvent>((event, emit) async {
       try {
         await UserRepository.updateUser( event.updatedUser);
-        emit(UpdateUserSuccess());
+        emit(UpdateUserSuccessState());
       } catch (e) {
-        emit(UserError(e.toString()));
+        emit(UserErrorState(e.toString()));
       }
     });
 
     on<DeleteUserEvent>((event, emit) async {
       try {
         await UserRepository.deleteUser(event.phoneNumber);
-        emit(DeletUserSuccess());
+        emit(DeletUserSuccessState());
       } catch (e) {
-        emit(UserError(e.toString()));
+        emit(UserErrorState(e.toString()));
       }
     });
     on<LoginSubmittedEvent>((event, emit) async {
       try {
-        emit(UserLoading());
+        emit(UserLoadingState());
         var result =await UserRepository.login(event.phoneNumber ,event.password);
         if(result["success"] == true)
           {
-            emit(UserLoginSuccess(result["user"]["id"]));
+            emit(UserLoginSuccessState(result["user"]["id"],result["user"]["role"]));
           }else{
-          emit(UserLoginFail());
+          emit(UserLoginFailState());
         }
 
       } catch (e) {
-        emit(UserError(e.toString()));
+        emit(UserErrorState(e.toString()));
       }
     });
   }

@@ -9,6 +9,7 @@ import 'package:shahrzad/widgets/customalertdialog.dart';
 import 'package:shahrzad/widgets/shake_animation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../blocs/size/sizes_bloc.dart';
+import '../cubit/userinfo_cubit.dart';
 import '../models/user_model.dart';
 import '../widgets/contentprivacypolicywidget.dart';
 import 'home.dart';
@@ -73,25 +74,26 @@ class _RegisterPageState extends State<RegisterPage> {
           color: mzhColorThem1[0], // رنگ پس‌زمینه کل صفحه
           child: BlocListener<UsersBloc, UsersState>(
             listener: (context, state) {
-              if (state is UserCreateSuccess) {
+              if (state is UserCreateSuccessState) {
+                // ذخیره در cubit
+                context.read<UserinfoCubit>().login(state.userID, 2);
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   // تابع async ناشناس برای استفاده از await
                   () async {
                     await customDialogBuilder(
                         context, "تبریک", "شما با موفقیت ثبت نام کردید");
-
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
                           create: (context) =>
                               SizesBloc()..add(LoadSizes(state.userID)),
-                          child: HomePage(userID: state.userID),
+                          child: HomePage(),
                         ),
                       ),
                     );
                   }(); // اجرای فوری تابع async
                 });
-              } else if (state is UserError) {
+              } else if (state is UserErrorState) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   // تابع async ناشناس برای استفاده از await
                   () async {

@@ -6,12 +6,21 @@ import 'package:shahrzad/classes/color.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shahrzad/pages/loginpage.dart';
 import 'blocs/internetconnection/connectivity_bloc.dart';
+import 'cubit/userinfo_cubit.dart';
 
 void main() {
-  runApp(BlocProvider(
-    create: (context) => ConnectivityBloc(Connectivity()),
-    child: const MyApp(),
-  ));
+  runApp(
+    BlocProvider(
+      create: (context) => ConnectivityBloc(Connectivity()),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => UsersBloc()),
+          BlocProvider(create: (context) => UserinfoCubit()),
+        ],
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -37,9 +46,6 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: mzhColorThem1[5]),
           useMaterial3: true,
         ),
-        home: BlocProvider(
-          create: (context) => UsersBloc(),
-          child: LoginPage(),
-        ));
+        home: LoginPage());
   }
 }

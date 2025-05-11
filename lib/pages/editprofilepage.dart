@@ -14,7 +14,8 @@ import 'home.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userID;
-  const EditProfilePage({super.key , required this.userID});
+  final int userRole;
+  const EditProfilePage({super.key , required this.userID ,required this.userRole});
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -55,21 +56,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
           color: mzhColorThem1[0], // رنگ پس‌زمینه کل صفحه
           child: BlocListener<UsersBloc, UsersState>(
             listener: (context, state) {
-              if (state is GetUserSuccess) {
+              if (state is GetUserSuccessState) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _nameController.text = state.user.name;
                   _famiyController.text = state.user.family;
                   _phonenumberController.text = state.user.phoneNumber;
                   () async {   }(); // اجرای فوری تابع async
                 });
-              } else if (state is UserError) {
+              } else if (state is UserErrorState) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   // تابع async ناشناس برای استفاده از await
                   () async {
                     await customDialogBuilder(context, "خطا", state.message);
                   }(); // اجرای فوری تابع async
                 });
-              }else if(state is UpdateUserSuccess)
+              }else if(state is UpdateUserSuccessState)
                 {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     // تابع async ناشناس برای استفاده از await
@@ -79,7 +80,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         MaterialPageRoute(
                             builder: (_) => BlocProvider(
                               create: (context) => SizesBloc()..add(LoadSizes(widget.userID)),
-                              child: HomePage(userID: widget.userID),
+                              child: HomePage(),
                             )),
                       );
                     }(); // اجرای فوری تابع async
@@ -231,7 +232,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                             MaterialPageRoute(
                                                 builder: (_) => BlocProvider(
                                                   create: (context) => SizesBloc()..add(LoadSizes(widget.userID)),
-                                                  child: HomePage(userID: widget.userID),
+                                                  child: HomePage(),
                                                 )),
                                           );
 

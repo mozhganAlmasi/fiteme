@@ -7,15 +7,15 @@ import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
 import 'package:shahrzad/pages/addsizepage.dart';
+import 'package:shahrzad/pages/adminpage.dart';
 import 'package:shahrzad/pages/editprofilepage.dart';
 import 'package:shahrzad/pages/showchartpage.dart';
+import '../cubit/userinfo_cubit.dart';
 import '../models/size_model.dart';
 import '../widgets/customalertdialog.dart';
 
 class HomePage extends StatefulWidget {
-  final String userID;
-
-  const HomePage({super.key, required this.userID});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -23,6 +23,19 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<SizeModel> lstSize = [];
+  late String userID; // متغیر برای ذخیره userID
+  late int userRole; // متغیر برای ذخیره userRole
+
+  @override
+  void initState() {
+    super.initState();
+    // اطلاعات userID و userRole را از Cubit می‌خوانیم و در متغیر ذخیره می‌کنیم.
+    final userInfo = context.read<UserinfoCubit>().state;
+    if (userInfo is UserinfoLoaded) {
+      userID = userInfo.userID;
+      userRole = userInfo.userRole;
+    }
+  }
 
   void _deleteItem(int index, int rowID) async {
     final confirm = await showDialog<bool>(
@@ -46,7 +59,7 @@ class _HomePageState extends State<HomePage> {
     if (confirm == true) {
       // فقط در صورتی حذف کن که کاربر تأیید کرده باشه
 
-      context.read<SizesBloc>().add(DeleteSize(widget.userID, rowID));
+      context.read<SizesBloc>().add(DeleteSize(userID, rowID));
     }
   }
 
@@ -56,11 +69,19 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(
               builder: (_) => BlocProvider(
-                    create: (context) =>
-                        UsersBloc()..add(GetUser(widget.userID)),
+                    create: (context) => UsersBloc()..add(GetUserEvant(userID)),
                     child: EditProfilePage(
-                      userID: widget.userID,
+                      userID: userID,
+                      userRole: userRole,
                     ),
+                  )));
+    } else if (value == 'manag_users') {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (_) => BlocProvider(
+                    create: (context) => UsersBloc()..add(LoadUsersEvent()),
+                    child: AdminPage(),
                   )));
     }
   }
@@ -69,14 +90,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false , // حذف آیکون back
+        automaticallyImplyLeading: false, // حذف آیکون back
         actions: [
           PopupMenuButton<String>(
-            onSelected: (value) => _onMenuSelected(context, value) ,
+            onSelected: (value) => _onMenuSelected(context, value),
             itemBuilder: (BuildContext context) => [
               PopupMenuItem(
-                value: 'edit_profile' ,
-                child: Text('ویرایش پروفایل') ,
+                value: 'edit_profile',
+                child: Text('ویرایش پروفایل'),
+              ),
+              if ( userRole == 1) PopupMenuItem(
+                value: 'manag_users',
+                child: Text('مدیریت لیست کاربران'),
               ),
             ],
           ),
@@ -84,27 +109,26 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SafeArea(
         child: Container(
-          color: mzhColorThem1[5] ,
+          color: mzhColorThem1[5],
           child: Padding(
-            padding: const EdgeInsets.all(8.0) ,
+            padding: const EdgeInsets.all(8.0),
             child: BlocListener<SizesBloc, SizesState>(
               listener: (context, state) {
                 // TODO: implement listener
                 if (state is SizeLoadSuccess) {
-                  lstSize = state.lstSize ;
-                }else if(state is SizeDeletSuccess){
+                  lstSize = state.lstSize;
+                } else if (state is SizeDeletSuccess) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     // تابع async ناشناس برای استفاده از await
                     () async {
                       await customDialogBuilder(
-                      context, "تبریک", "حذف با موفقیت انجام شد");
+                          context, "تبریک", "حذف با موفقیت انجام شد");
 
-                    setState(() {
-                      lstSize.removeWhere((item) => item.id == state.rowID);
-                    });
+                      setState(() {
+                        lstSize.removeWhere((item) => item.id == state.rowID);
+                      });
                     }(); // اجرای فوری تابع async
                   });
-
                 }
               },
               child: BlocBuilder<SizesBloc, SizesState>(
@@ -112,27 +136,27 @@ class _HomePageState extends State<HomePage> {
                   if (state is SizeLoading) {
                     return const Center(
                       child: SizedBox(
-                        width: 60 ,
-                        height: 60 ,
+                        width: 60,
+                        height: 60,
                         child: CircularProgressIndicator(
-                          strokeWidth: 6 ,
-                          color: Colors.deepPurple , // یا هر رنگی که خواستی
+                          strokeWidth: 6,
+                          color: Colors.deepPurple, // یا هر رنگی که خواستی
                         ),
                       ),
                     );
-                  }
-                  else if (state is SizeLoadSuccess ||state is SizeDeletSuccess) {
+                  } else if (state is SizeLoadSuccess ||
+                      state is SizeDeletSuccess) {
                     return Container(
                       color: mzhColorThem1[2],
                       child: AnimationLimiter(
                           child: ListView.builder(
-                        itemCount: lstSize.length ,
+                        itemCount: lstSize.length,
                         padding: const EdgeInsets.all(12),
                         itemBuilder: (context, index) {
-                          final item = lstSize[index] ;
+                          final item = lstSize[index];
                           return AnimationConfiguration.staggeredList(
-                            position: index ,
-                            duration: const Duration(milliseconds: 400) ,
+                            position: index,
+                            duration: const Duration(milliseconds: 400),
                             child: SlideAnimation(
                               verticalOffset: 50,
                               child: FadeInAnimation(
@@ -176,8 +200,8 @@ class _HomePageState extends State<HomePage> {
                                                           MaterialPageRoute(
                                                               builder: (context) =>
                                                                   ShowChartPage(
-                                                                      userID: widget
-                                                                          .userID,
+                                                                      userID:
+                                                                          userID,
                                                                       lstSize:
                                                                           lstSize,
                                                                       title: e
@@ -212,8 +236,7 @@ class _HomePageState extends State<HomePage> {
                         },
                       )),
                     );
-                  }
-                  else if (state is SizeFail) {
+                  } else if (state is SizeFail) {
                     return Container(
                       child: Center(
                         child: Padding(
@@ -241,7 +264,7 @@ class _HomePageState extends State<HomePage> {
               MaterialPageRoute(
                   builder: (context) => BlocProvider(
                         create: (context) => SizesBloc(),
-                        child: AddsizePage(userID: widget.userID),
+                        child: AddsizePage(userID: userID),
                       )));
         },
         child: Icon(Icons.add),

@@ -8,6 +8,7 @@ import 'package:shahrzad/classes/style.dart';
 import 'package:shahrzad/pages/home.dart';
 import 'package:shahrzad/pages/registerpage.dart';
 import '../blocs/internetconnection/connectivity_bloc.dart';
+import '../cubit/userinfo_cubit.dart';
 import '../widgets/customalertdialog.dart';
 
 class LoginPage extends StatefulWidget {
@@ -43,7 +44,9 @@ class _LoginPageState extends State<LoginPage> {
           listeners: [
             BlocListener<UsersBloc, UsersState>(
               listener: (contextbuilder, state) {
-                if (state is UserLoginSuccess) {
+                if (state is UserLoginSuccessState) {
+                  // ذخیره در cubit
+                  context.read<UserinfoCubit>().login(state.userID, state.userRole);
                   _userLoading = false;
                   print("UserID:" + state.userID);
                   WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -52,22 +55,22 @@ class _LoginPageState extends State<LoginPage> {
                           builder: (_) => BlocProvider(
                                 create: (context) =>
                                     SizesBloc()..add(LoadSizes(state.userID)),
-                                child: HomePage(userID: state.userID),
+                                child: HomePage(),
                               )),
                     );
                   });
-                } else if (state is UserLoginFail) {
+                } else if (state is UserLoginFailState) {
                   _userLoading = false;
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     customDialogBuilder(context, "خطا در ورود کاربر",
                         "شماره همراه یا رمز ورود صحیح نمی باشد");
                   });
-                } else if (state is UserError) {
+                } else if (state is UserErrorState) {
                   _userLoading = false;
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     customDialogBuilder(context, "", "خطا در دریافت اطلاعت");
                   });
-                } else if (state is UserLoading) {
+                } else if (state is UserLoadingState) {
                   _userLoading = true;
                 }
               },

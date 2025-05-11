@@ -5,9 +5,9 @@ part of 'users_bloc.dart';
 sealed class UsersEvent {}
 
 class LoadUsersEvent extends UsersEvent {}
-class GetUser extends UsersEvent {
+class GetUserEvant extends UsersEvent {
   final String userID;
-  GetUser(this.userID);
+  GetUserEvant(this.userID);
 }
 class CreateUserEvent extends UsersEvent {
   final UserModel user;
