@@ -9,7 +9,9 @@ import 'package:shahrzad/classes/style.dart';
 import 'package:shahrzad/pages/addsizepage.dart';
 import 'package:shahrzad/pages/adminpage.dart';
 import 'package:shahrzad/pages/editprofilepage.dart';
+import 'package:shahrzad/pages/loginpage.dart';
 import 'package:shahrzad/pages/showchartpage.dart';
+import '../classes/appexisthandler.dart';
 import '../cubit/userinfo_cubit.dart';
 import '../models/size_model.dart';
 import '../widgets/customalertdialog.dart';
@@ -83,6 +85,8 @@ class _HomePageState extends State<HomePage> {
                     create: (context) => UsersBloc()..add(LoadUsersEvent()),
                     child: AdminPage(),
                   )));
+    }else if (value == 'exit') {
+      AppExitHandler.exitApp(context, loginPage: LoginPage());
     }
   }
 
@@ -99,9 +103,14 @@ class _HomePageState extends State<HomePage> {
                 value: 'edit_profile',
                 child: Text('ویرایش پروفایل'),
               ),
-              if ( userRole == 1) PopupMenuItem(
-                value: 'manag_users',
-                child: Text('مدیریت لیست کاربران'),
+              if (userRole == 1)
+                PopupMenuItem(
+                  value: 'manag_users',
+                  child: Text('مدیریت لیست کاربران'),
+                ),
+              PopupMenuItem(
+                value: 'exit',
+                child: Text(' خروج'),
               ),
             ],
           ),
