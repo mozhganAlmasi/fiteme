@@ -53,6 +53,7 @@ class SizeModel {
     };
   }
 }
+
 extension SizeModelDisplay on SizeModel {
   Map<String, dynamic> toDisplayMap() {
     return {

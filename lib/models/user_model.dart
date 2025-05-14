@@ -7,6 +7,8 @@ class UserModel {
   final String email;
   final String phoneNumber;
   final String password;
+  final bool active;
+  final int coachCode;
 
   UserModel({
     this.id,
@@ -17,6 +19,8 @@ class UserModel {
     required this.email,
     required this.phoneNumber,
     required this.password,
+    required this.active,
+    required this.coachCode,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -29,6 +33,8 @@ class UserModel {
       email: json['email'],
       phoneNumber: json['phonenumber'],
       password: json['password'],
+      active: json['active'] == 1,
+      coachCode: json['coach_code'],
     );
   }
 
@@ -40,5 +46,7 @@ class UserModel {
     'email': email,
     'phonenumber': phoneNumber,
     'password': password,
+    'active': active,
+    'coach_code': coachCode,
   };
 }

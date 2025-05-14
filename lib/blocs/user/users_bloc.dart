@@ -22,6 +22,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
         emit(UserErrorState(e.toString()));
       }
     });
+
     on<GetUserEvant>((event, emit) async {
       emit(UserLoadingState());
       try {
@@ -31,6 +32,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
         emit(UserErrorState(e.toString()));
       }
     });
+
     on<CreateUserEvent>((event, emit) async {
       try {
         final userID= await UserRepository.createUser(event.user);
@@ -57,6 +59,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
         emit(UserErrorState(e.toString()));
       }
     });
+
     on<LoginSubmittedEvent>((event, emit) async {
       try {
         emit(UserLoadingState());

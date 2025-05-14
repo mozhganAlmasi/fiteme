@@ -300,7 +300,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 phoneNumber:
                                                     _phonenumberController.text,
                                                 password:
-                                                    _passwordController.text);
+                                                    _passwordController.text,
+                                                active: true,
+                                                coachCode: 1234,
+                                            );
                                             context
                                                 .read<UsersBloc>()
                                                 .add(CreateUserEvent(user));

@@ -8,14 +8,13 @@ import 'package:shahrzad/pages/loginpage.dart';
 import 'package:shahrzad/widgets/customalertdialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../blocs/size/sizes_bloc.dart';
+import '../cubit/userinfo_cubit.dart';
 import '../models/user_model.dart';
 import '../widgets/contentprivacypolicywidget.dart';
 import 'home.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final String userID;
-  final int userRole;
-  const EditProfilePage({super.key , required this.userID ,required this.userRole});
+  const EditProfilePage({super.key });
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -28,13 +27,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _phonenumberController = TextEditingController();
   final _passwordController = TextEditingController();
   final _repasswordController = TextEditingController();
+  int _coach_code = 0;
+  int _userRole = 2;
   bool _obscureText = false;
+  String? selectedGroup;
+  int selectedIndex = 1;
+  final List<String> lstGroupname = [
+    'ایروبیک',
+    'ایروبیک فانکشنال',
+    'CX',
+  ];
+  bool _initialized = false;
+  late String userID;
 
   @override
   void initState() {
     super.initState();
+    // اطلاعات userID و userRole را از Cubit می‌خوانیم و در متغیر ذخیره می‌کنیم.
+    final userInfo = context.read<UserinfoCubit>().state;
+    if (userInfo is UserinfoLoaded) {
+      userID = userInfo.userID;
+    }
   }
-
   @override
   void dispose() {
     super.dispose();
@@ -61,6 +75,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   _nameController.text = state.user.name;
                   _famiyController.text = state.user.family;
                   _phonenumberController.text = state.user.phoneNumber;
+                  _coach_code = state.user.coachCode;
+                  _userRole = state.user.role;
+                  selectedIndex = state.user.groupId;
+                  selectedGroup = lstGroupname[selectedIndex - 1];
+                  setState(() {});
                   () async {   }(); // اجرای فوری تابع async
                 });
               } else if (state is UserErrorState) {
@@ -79,7 +98,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                             builder: (_) => BlocProvider(
-                              create: (context) => SizesBloc()..add(LoadSizes(widget.userID)),
+                              create: (context) => SizesBloc()..add(LoadSizes(userID)),
                               child: HomePage(),
                             )),
                       );
@@ -150,6 +169,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                     return null;
                                   },
                                 ),
+                                const SizedBox(height: 20,),
+                                DropdownButtonFormField<String>(
+                                  value: selectedGroup,
+                                  hint: Text('انتخاب کنید'),
+                                  items: lstGroupname.map((String group) {
+                                    return DropdownMenuItem<String>(
+                                      value: group,
+                                      child: Text(group),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedGroup = newValue;
+                                      selectedIndex = lstGroupname
+                                          .indexOf(newValue!) +
+                                          1;
+                                      print(selectedIndex.toString());
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.purple.shade50,
+                                    // بنفش کم‌رنگ
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 10),
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                  dropdownColor: Colors
+                                      .purple.shade50, // پس‌زمینه لیست
+                                ),
                                 const SizedBox(height: 20),
                                 TextFormField(
                                   controller: _passwordController,
@@ -200,16 +253,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         ),
                                         onPressed: () async {
                                           UserModel user = UserModel(
-                                              id: widget.userID,
+                                              id: userID,
                                               name: _nameController.text,
                                               family: _famiyController.text,
-                                              groupId: 0,
-                                              role: 2,
+                                              groupId: selectedIndex,
+                                              role: _userRole,
                                               email: "test@almaseman.ir",
                                               phoneNumber:
                                               _phonenumberController.text,
                                               password:
-                                              _passwordController.text);
+                                              _passwordController.text,
+                                               active: true,
+                                               coachCode: _coach_code
+
+                                          );
                                           context
                                               .read<UsersBloc>()
                                               .add((UpdateUserEvent(user)));
@@ -231,7 +288,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           Navigator.of(context).pushReplacement(
                                             MaterialPageRoute(
                                                 builder: (_) => BlocProvider(
-                                                  create: (context) => SizesBloc()..add(LoadSizes(widget.userID)),
+                                                  create: (context) => SizesBloc()..add(LoadSizes(userID)),
                                                   child: HomePage(),
                                                 )),
                                           );

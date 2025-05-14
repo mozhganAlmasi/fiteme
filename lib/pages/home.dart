@@ -72,10 +72,7 @@ class _HomePageState extends State<HomePage> {
           MaterialPageRoute(
               builder: (_) => BlocProvider(
                     create: (context) => UsersBloc()..add(GetUserEvant(userID)),
-                    child: EditProfilePage(
-                      userID: userID,
-                      userRole: userRole,
-                    ),
+                    child: EditProfilePage( ),
                   )));
     } else if (value == 'manag_users') {
       Navigator.push(

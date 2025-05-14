@@ -37,7 +37,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
@@ -69,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                 } else if (state is UserErrorState) {
                   _userLoading = false;
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    customDialogBuilder(context, "", "خطا در دریافت اطلاعت");
+                    customDialogBuilder(context, "" , "خطا در دریافت اطلاعت");
                   });
                 } else if (state is UserLoadingState) {
                   _userLoading = true;

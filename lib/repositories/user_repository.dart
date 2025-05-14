@@ -21,7 +21,7 @@ class UserRepository {
     try {
       final response = await http.get(Uri.parse('$baseUrl/listusers'));
       if (response.statusCode == 200) {
-        final List data = json.decode(response.body)['users'];
+        final List data = json.decode(response.body);
         return data.map((e) => UserModel.fromJson(e)).toList();
       } else {
         throw Exception('Failed to load users');
@@ -56,6 +56,7 @@ class UserRepository {
         'name': updatedUser.name,
         'family': updatedUser.family,
         'email': updatedUser.email,
+        'groupid' :updatedUser.groupId,
         'phonenumber': updatedUser.phoneNumber,
         'password': updatedUser.password
       };
@@ -89,12 +90,12 @@ class UserRepository {
       final response = await http.get(Uri.parse('$baseUrl/getuser?id=$userid'),
           headers: {'Content-Type': 'application/json'});
       if (response.statusCode != 200) {
-        throw Exception('Failed to create user');
+        throw Exception('Failed to get list users');
       }
       final responseData = json.decode(response.body);
       return UserModel.fromJson(responseData);
     } catch (e) {
-      throw Exception('Failed to delete users: $e');
+      throw Exception('Failed to get list users: $e');
     }
   }
 
