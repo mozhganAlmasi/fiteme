@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(
               builder: (_) => BlocProvider(
-                    create: (context) => UsersBloc()..add(LoadUsersEvent()),
+                    create: (context) => UsersBloc()..add(LoadUsersEvent(1234)),
                     child: AdminPage(),
                   )));
     }else if (value == 'exit') {

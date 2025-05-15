@@ -8,8 +8,9 @@ class UserinfoInitial extends UserinfoState {}
 class UserinfoLoaded extends UserinfoState {
   final String userID;
   final int userRole;
+  final int coachCode;
 
-  UserinfoLoaded({required this.userID, required this.userRole});
+  UserinfoLoaded({required this.userID, required this.userRole , required this.coachCode});
 }
 
 class UserinfoLoggedOut extends UserinfoState {}

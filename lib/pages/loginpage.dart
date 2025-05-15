@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
               listener: (contextbuilder, state) {
                 if (state is UserLoginSuccessState) {
                   // ذخیره در cubit
-                  context.read<UserinfoCubit>().login(state.userID, state.userRole);
+                  context.read<UserinfoCubit>().login(state.userID, state.userRole , state.coachCode);
                   _userLoading = false;
                   print("UserID:" + state.userID);
                   WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -76,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
             listener: (context, state) {
               if (state is UserCreateSuccessState) {
                 // ذخیره در cubit
-                context.read<UserinfoCubit>().login(state.userID, 2);
+                context.read<UserinfoCubit>().login(state.userID, 2, 1234);
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   // تابع async ناشناس برای استفاده از await
                   () async {

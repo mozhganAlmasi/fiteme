@@ -22,7 +22,8 @@ class UpdateUserSuccessState extends UsersState {
 class UserLoginSuccessState extends UsersState {
   final String userID ;
   final int userRole;
-  UserLoginSuccessState(this.userID , this.userRole);
+  final int coachCode;
+  UserLoginSuccessState(this.userID , this.userRole , this.coachCode);
 }
 class UserLoginFailState extends UsersState {
 }

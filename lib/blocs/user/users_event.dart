@@ -4,7 +4,10 @@ part of 'users_bloc.dart';
 @immutable
 sealed class UsersEvent {}
 
-class LoadUsersEvent extends UsersEvent {}
+class LoadUsersEvent extends UsersEvent {
+  final int coachCode;
+  LoadUsersEvent(this.coachCode);
+}
 class GetUserEvant extends UsersEvent {
   final String userID;
   GetUserEvant(this.userID);

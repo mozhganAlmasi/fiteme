@@ -17,9 +17,9 @@ Future<String?> getToken() async {
 class UserRepository {
   static final String baseUrl = 'https://almaseman.ir/api/users';
 
-  static Future<List<UserModel>> getAllUsers() async {
+  static Future<List<UserModel>> getAllUsers(int coachCode) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/listusers'));
+      final response = await http.get(Uri.parse('$baseUrl/listusers?coach_code=$coachCode'));
       if (response.statusCode == 200) {
         final List data = json.decode(response.body);
         return data.map((e) => UserModel.fromJson(e)).toList();
