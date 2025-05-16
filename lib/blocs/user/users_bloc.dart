@@ -66,7 +66,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
         var result =await UserRepository.login(event.phoneNumber ,event.password);
         if(result["success"] == true)
           {
-            emit(UserLoginSuccessState(result["user"]["id"],result["user"]["role"] , result["user"]["coach_code"]));
+            emit(UserLoginSuccessState(UserModel.fromJson(result["user"])));
           }else{
           emit(UserLoginFailState());
         }

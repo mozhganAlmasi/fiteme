@@ -58,7 +58,8 @@ class UserRepository {
         'email': updatedUser.email,
         'groupid' :updatedUser.groupId,
         'phonenumber': updatedUser.phoneNumber,
-        'password': updatedUser.password
+        'password': updatedUser.password,
+        'active':updatedUser.active
       };
       final response = await http.put(
         Uri.parse('$baseUrl/update'),

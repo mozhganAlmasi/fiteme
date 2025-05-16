@@ -21,6 +21,7 @@ class _AdminPageState extends State<AdminPage> {
   List<UserModel> lstUserMain = [];
   String? selectedGroup;
   int selectedIndex = 1;
+  String deletItemID ="";
   final List<String> lstGroupname = [
     'همه گروه ها',
     'ایروبیک',
@@ -49,6 +50,7 @@ class _AdminPageState extends State<AdminPage> {
     if (confirm == true) {
       // فقط در صورتی حذف کن که کاربر تأیید کرده باشه
       context.read<UsersBloc>().add(DeleteUserEvent(phoneNumber));
+
     }
   }
   @override
@@ -86,7 +88,7 @@ class _AdminPageState extends State<AdminPage> {
                           context, "تبریک", "حذف با موفقیت انجام شد");
 
                           setState(() {
-                            // lstUser.removeWhere((item) => item.id == state.);
+                             lstUser.removeWhere((item) => item.id == deletItemID);
                           });
                         }
                         (); // اجرای فوری تابع async
@@ -120,7 +122,9 @@ class _AdminPageState extends State<AdminPage> {
                         );
                       }
                       else if (state is UserLoadedState ||
-                          state is DeletUserSuccessState) {
+                          state is DeletUserSuccessState ||
+                      state is UpdateUserSuccessState
+                      ) {
                         return Container(
                           color: mzhColorThem1[2],
                           child: Column(
@@ -211,9 +215,22 @@ class _AdminPageState extends State<AdminPage> {
                                                               // یا 'active'
                                                               onStatusChanged:
                                                                   (status) {
-                                                                print(
-                                                                    'وضعیت جدید کاربر: $status');
-                                                                // اینجا می‌تونی مقدار رو در فرم یا سرور ذخیره کنی
+                                                                    UserModel user = UserModel(
+                                                                        id: item.id,
+                                                                        name: item.name,
+                                                                        family: item.family,
+                                                                        groupId: selectedIndex,
+                                                                        role: item.role,
+                                                                        email: "test@almaseman.ir",
+                                                                        phoneNumber:
+                                                                        item.phoneNumber,
+                                                                        password: "",
+                                                                        active:(item.active)? false:true,
+                                                                        coachCode: item.coachCode
+                                                                    );
+                                                                    context
+                                                                        .read<UsersBloc>()
+                                                                        .add((UpdateUserEvent(user)));
                                                               },
                                                             ),
                                                           ),
@@ -268,6 +285,7 @@ class _AdminPageState extends State<AdminPage> {
                                                                     color: Colors
                                                                         .red),
                                                                 onPressed: () {
+                                                                  deletItemID = item.id!;
                                                                   _deleteItem(item.phoneNumber);
                                                                 }),
                                                           ),

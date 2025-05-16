@@ -45,20 +45,28 @@ class _LoginPageState extends State<LoginPage> {
             BlocListener<UsersBloc, UsersState>(
               listener: (contextbuilder, state) {
                 if (state is UserLoginSuccessState) {
-                  // ذخیره در cubit
-                  context.read<UserinfoCubit>().login(state.userID, state.userRole , state.coachCode);
                   _userLoading = false;
-                  print("UserID:" + state.userID);
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                          builder: (_) => BlocProvider(
+                  if(state.user.active)
+                    {
+                      context.read<UserinfoCubit>().login(state.user.id!, state.user.role , state.user.coachCode);
+                      print("UserID:" + state.user.id.toString());
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                              builder: (_) => BlocProvider(
                                 create: (context) =>
-                                    SizesBloc()..add(LoadSizes(state.userID)),
+                                SizesBloc()..add(LoadSizes(state.user.id!)),
                                 child: HomePage(),
                               )),
-                    );
-                  });
+                        );
+                      });
+                    }else{
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      customDialogBuilder(context, "خطا در ورود کاربر",
+                          "شما توسط مدیر غیر فعال شده اید");
+                    });
+                  }
+
                 } else if (state is UserLoginFailState) {
                   _userLoading = false;
                   WidgetsBinding.instance.addPostFrameCallback((_) {

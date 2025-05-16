@@ -24,10 +24,8 @@ class DeletUserFailState extends UsersState {
 class UpdateUserSuccessState extends UsersState {
 }
 class UserLoginSuccessState extends UsersState {
-  final String userID ;
-  final int userRole;
-  final int coachCode;
-  UserLoginSuccessState(this.userID , this.userRole , this.coachCode);
+  final UserModel user ;
+  UserLoginSuccessState(this.user);
 }
 class UserLoginFailState extends UsersState {
 }
