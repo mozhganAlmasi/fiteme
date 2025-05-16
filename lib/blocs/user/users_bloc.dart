@@ -56,7 +56,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
         await UserRepository.deleteUser(event.phoneNumber);
         emit(DeletUserSuccessState());
       } catch (e) {
-        emit(UserErrorState(e.toString()));
+        emit(DeletUserFailState(e.toString()));
       }
     });
 

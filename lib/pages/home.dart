@@ -60,7 +60,6 @@ class _HomePageState extends State<HomePage> {
 
     if (confirm == true) {
       // فقط در صورتی حذف کن که کاربر تأیید کرده باشه
-
       context.read<SizesBloc>().add(DeleteSize(userID, rowID));
     }
   }

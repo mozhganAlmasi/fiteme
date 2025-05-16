@@ -17,6 +17,10 @@ class GetUserSuccessState extends UsersState {
 }
 class DeletUserSuccessState extends UsersState {
 }
+class DeletUserFailState extends UsersState {
+  String msg;
+  DeletUserFailState(this.msg);
+}
 class UpdateUserSuccessState extends UsersState {
 }
 class UserLoginSuccessState extends UsersState {

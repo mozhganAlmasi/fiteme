@@ -75,8 +75,11 @@ class UserRepository {
 
   static Future<void> deleteUser(String phoneNumber) async {
     try {
-      final response =
-          await http.delete(Uri.parse('$baseUrl/delete/$phoneNumber'));
+      final response = await http.delete(
+        Uri.parse('$baseUrl/delete'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'phonenumber': phoneNumber}),
+      );
       if (response.statusCode != 200) {
         throw Exception('Failed to delete user');
       }

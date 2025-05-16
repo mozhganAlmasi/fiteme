@@ -27,7 +27,30 @@ class _AdminPageState extends State<AdminPage> {
     'ایروبیک فانکشنال',
     'CX',
   ];
+  void _deleteItem(String phoneNumber) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("تأیید حذف"),
+        content: const Text("آیا از حذف این آیتم مطمئن هستید؟"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text("لغو"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text("حذف"),
+          ),
+        ],
+      ),
+    );
 
+    if (confirm == true) {
+      // فقط در صورتی حذف کن که کاربر تأیید کرده باشه
+      context.read<UsersBloc>().add(DeleteUserEvent(phoneNumber));
+    }
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery
@@ -62,6 +85,18 @@ class _AdminPageState extends State<AdminPage> {
                           await customDialogBuilder(
                           context, "تبریک", "حذف با موفقیت انجام شد");
 
+                          setState(() {
+                            // lstUser.removeWhere((item) => item.id == state.);
+                          });
+                        }
+                        (); // اجرای فوری تابع async
+                      });
+                    }else if (state is DeletUserFailState) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        // تابع async ناشناس برای استفاده از await
+                        () async {
+                          await customDialogBuilder(
+                          context, "خطا", "مشکلی در حذف اطلاعات پیش آمده .");
                           setState(() {
                             // lstUser.removeWhere((item) => item.id == state.);
                           });
@@ -232,7 +267,9 @@ class _AdminPageState extends State<AdminPage> {
                                                                     .delete,
                                                                     color: Colors
                                                                         .red),
-                                                                onPressed: () {}),
+                                                                onPressed: () {
+                                                                  _deleteItem(item.phoneNumber);
+                                                                }),
                                                           ),
                                                         ],
                                                       )
@@ -255,7 +292,7 @@ class _AdminPageState extends State<AdminPage> {
                             child: Padding(
                               padding: const EdgeInsets.all(12),
                               child: Text(
-                                "هیچ اطلاعاتی برای نمایش وجود ندارد ، لطفا با انتخاب گزینه افزودن ، سایز های خود را به برنامه اضافه کنید",
+                                "خطا در دریافت اطلاعات",
                                 style: CustomTextStyle.textinputdata,
                               ),
                             ),
