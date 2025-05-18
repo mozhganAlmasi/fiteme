@@ -36,7 +36,10 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     on<CreateUserEvent>((event, emit) async {
       try {
         final userID= await UserRepository.createUser(event.user);
-        emit(UserCreateSuccessState(userID));
+       if(userID == "Duplicate ")
+           emit(UserDuplicate());
+         else
+           emit(UserCreateSuccessState(userID));
       } catch (e) {
         emit(UserErrorState(e.toString()));
       }

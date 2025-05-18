@@ -13,11 +13,7 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
       // TODO: implement event handler
     });
     on<LoadingSize>((event, emit) async {
-      try {
-        emit(SizeLoading());
-      } catch (e) {
-        emit(SizeFail(e.toString()));
-      }
+      emit(SizeLoading());
     });
 
     on<CreateSize>((event, emit) async {
@@ -25,7 +21,7 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
         await SizeRepository.createSize(event.Size);
         emit(SizeCreateSuccess());
       } catch (e) {
-        emit(SizeFail(e.toString()));
+        emit(SizeCreateFail(e.toString()));
       }
     });
 
@@ -40,7 +36,7 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
         }
 
       } catch (e) {
-        emit(SizeFail(e.toString()));
+        emit(SizeLoadFail(e.toString()));
       }
     });
 
@@ -49,7 +45,7 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
         await SizeRepository.deletSize(event.userID, event.rowID);
         emit(SizeDeletSuccess(event.rowID));
       }catch(e){
-        emit(SizeFail(e.toString()));
+        emit(SizeDeleteFail(e.toString()));
       }
     });
 

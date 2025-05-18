@@ -33,6 +33,9 @@ class UserCreateSuccessState extends UsersState {
   final String userID ;
   UserCreateSuccessState(this.userID);
 }
+class UserDuplicate extends UsersState{
+
+}
 class UserErrorState extends UsersState {
   final String message;
   UserErrorState(this.message);

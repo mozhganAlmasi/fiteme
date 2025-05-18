@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                   _userLoading = false;
                   if(state.user.active)
                     {
-                      context.read<UserinfoCubit>().login(state.user.id!, state.user.role , state.user.coachCode);
+                      context.read<UserinfoCubit>().login(state.user.id!, state.user.role , state.user.coach_code);
                       print("UserID:" + state.user.id.toString());
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         Navigator.of(context).pushReplacement(

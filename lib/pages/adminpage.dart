@@ -143,7 +143,7 @@ class _AdminPageState extends State<AdminPage> {
                                     selectedGroup = newValue;
                                     selectedIndex =
                                         lstGroupname.indexOf(newValue!) ;
-                                    (selectedIndex ==0)?lstUser=lstUserMain: lstUser= lstUserMain.where((user) => user.groupId == selectedIndex).toList();
+                                    (selectedIndex ==0)?lstUser=lstUserMain: lstUser= lstUserMain.where((user) => user.groupid == selectedIndex).toList();
                                   });
                                 },
                                 decoration: InputDecoration(
@@ -219,14 +219,14 @@ class _AdminPageState extends State<AdminPage> {
                                                                         id: item.id,
                                                                         name: item.name,
                                                                         family: item.family,
-                                                                        groupId: selectedIndex,
+                                                                        groupid: selectedIndex,
                                                                         role: item.role,
                                                                         email: "test@almaseman.ir",
-                                                                        phoneNumber:
-                                                                        item.phoneNumber,
+                                                                        phonenumber:
+                                                                        item.phonenumber,
                                                                         password: "",
                                                                         active:(item.active)? false:true,
-                                                                        coachCode: item.coachCode
+                                                                        coach_code: item.coach_code
                                                                     );
                                                                     context
                                                                         .read<UsersBloc>()
@@ -262,7 +262,7 @@ class _AdminPageState extends State<AdminPage> {
                                                                   item.family +
                                                                   "\n\n" +
                                                                   item
-                                                                      .phoneNumber +
+                                                                      .phonenumber +
                                                                   "\n\n" +
                                                                   item.email );
                                                         },
@@ -286,7 +286,7 @@ class _AdminPageState extends State<AdminPage> {
                                                                         .red),
                                                                 onPressed: () {
                                                                   deletItemID = item.id!;
-                                                                  _deleteItem(item.phoneNumber);
+                                                                  _deleteItem(item.phonenumber);
                                                                 }),
                                                           ),
                                                         ],

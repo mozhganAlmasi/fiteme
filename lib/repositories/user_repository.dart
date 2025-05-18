@@ -39,10 +39,14 @@ class UserRepository {
 
         body: json.encode(user.toJson()), // id ارسال نمی‌شود
       );
+      if (response.statusCode == 400) {
+        return "Duplicate ";
+      }
+      final responseData = json.decode(response.body);
       if (response.statusCode != 200) {
         throw Exception('Failed to create user');
       }
-      final responseData = json.decode(response.body);
+    //  final responseData = json.decode(response.body);
       return responseData['id']; // شناسه کاربر جدید
     } catch (e) {
       throw Exception('Failed to create users: $e');
@@ -56,8 +60,8 @@ class UserRepository {
         'name': updatedUser.name,
         'family': updatedUser.family,
         'email': updatedUser.email,
-        'groupid' :updatedUser.groupId,
-        'phonenumber': updatedUser.phoneNumber,
+        'groupid' :updatedUser.groupid,
+        'phonenumber': updatedUser.phonenumber,
         'password': updatedUser.password,
         'active':updatedUser.active
       };

@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   List<SizeModel> lstSize = [];
   late String userID; // متغیر برای ذخیره userID
   late int userRole; // متغیر برای ذخیره userRole
+  late int coachCode;
 
   @override
   void initState() {
@@ -36,6 +37,7 @@ class _HomePageState extends State<HomePage> {
     if (userInfo is UserinfoLoaded) {
       userID = userInfo.userID;
       userRole = userInfo.userRole;
+      coachCode = userInfo.coachCode;
     }
   }
 
@@ -78,7 +80,7 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(
               builder: (_) => BlocProvider(
-                    create: (context) => UsersBloc()..add(LoadUsersEvent(1234)),
+                    create: (context) => UsersBloc()..add(LoadUsersEvent(coachCode)),
                     child: AdminPage(),
                   )));
     }else if (value == 'exit') {
@@ -134,6 +136,14 @@ class _HomePageState extends State<HomePage> {
                       });
                     }(); // اجرای فوری تابع async
                   });
+                }else if (state is SizeDeleteFail) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    // تابع async ناشناس برای استفاده از await
+                    () async {
+                      await customDialogBuilder(
+                      context, "خطا", "مشکلی در حذف اندازه پیش آمده");
+                    }(); // اجرای فوری تابع async
+                  });
                 }
               },
               child: BlocBuilder<SizesBloc, SizesState>(
@@ -153,95 +163,106 @@ class _HomePageState extends State<HomePage> {
                       state is SizeDeletSuccess) {
                     return Container(
                       color: mzhColorThem1[2],
-                      child: AnimationLimiter(
-                          child: ListView.builder(
-                        itemCount: lstSize.length,
-                        padding: const EdgeInsets.all(12),
-                        itemBuilder: (context, index) {
-                          final item = lstSize[index];
-                          return AnimationConfiguration.staggeredList(
-                            position: index,
-                            duration: const Duration(milliseconds: 400),
-                            child: SlideAnimation(
-                              verticalOffset: 50,
-                              child: FadeInAnimation(
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  elevation: 6,
-                                  margin: EdgeInsets.symmetric(vertical: 10),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Text(
-                                            'تاریخ اندازه گیری : ${item.dateInsert}',
-                                            style: GoogleFonts.vazirmatn(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold)),
-                                        const SizedBox(height: 10),
-                                        Wrap(
-                                          spacing: 10,
-                                          runSpacing: 6,
-                                          children: item
-                                              .toDisplayMap()
-                                              .entries
-                                              .map((e) => ActionChip(
-                                                    avatar: Icon(Icons.insights,
-                                                        size: 20,
-                                                        color: Colors.purple),
-                                                    label: Text(
-                                                        '${e.key}: ${e.value.toString()} cm',
-                                                        style: GoogleFonts
-                                                            .vazirmatn(
-                                                                fontSize: 14)),
-                                                    backgroundColor:
-                                                        Colors.teal.shade50,
-                                                    onPressed: () {
-                                                      Navigator.pushReplacement(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  ShowChartPage(
-                                                                      userID:
-                                                                          userID,
-                                                                      lstSize:
-                                                                          lstSize,
-                                                                      title: e
-                                                                          .key)));
-                                                    },
-                                                  ))
-                                              .toList(),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            Tooltip(
-                                              message: 'حذف',
-                                              child: IconButton(
-                                                icon: Icon(Icons.delete,
-                                                    color: Colors.red),
-                                                onPressed: () =>
-                                                    _deleteItem(index, item.id),
+                      child: Column(
+                        children: [
+                          if(userRole ==1 ) Container(color:mzhColorThem1[3],child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text("کد مربیگری شما : " + coachCode.toString(),style: CustomTextStyle.textbutton,),
+                          )),
+                          Expanded(
+
+                            child: AnimationLimiter(
+                                child: ListView.builder(
+                              itemCount: lstSize.length,
+                              padding: const EdgeInsets.all(12),
+                              itemBuilder: (context, index) {
+                                final item = lstSize[index];
+                                return AnimationConfiguration.staggeredList(
+                                  position: index,
+                                  duration: const Duration(milliseconds: 400),
+                                  child: SlideAnimation(
+                                    verticalOffset: 50,
+                                    child: FadeInAnimation(
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20)),
+                                        elevation: 6,
+                                        margin: EdgeInsets.symmetric(vertical: 10),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(16),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              Text(
+                                                  'تاریخ اندازه گیری : ${item.dateInsert}',
+                                                  style: GoogleFonts.vazirmatn(
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.bold)),
+                                              const SizedBox(height: 10),
+                                              Wrap(
+                                                spacing: 10,
+                                                runSpacing: 6,
+                                                children: item
+                                                    .toDisplayMap()
+                                                    .entries
+                                                    .map((e) => ActionChip(
+                                                          avatar: Icon(Icons.insights,
+                                                              size: 20,
+                                                              color: Colors.purple),
+                                                          label: Text(
+                                                              '${e.key}: ${e.value.toString()} cm',
+                                                              style: GoogleFonts
+                                                                  .vazirmatn(
+                                                                      fontSize: 14)),
+                                                          backgroundColor:
+                                                              Colors.teal.shade50,
+                                                          onPressed: () {
+                                                            Navigator.pushReplacement(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder: (context) =>
+                                                                        ShowChartPage(
+                                                                            userID:
+                                                                                userID,
+                                                                            lstSize:
+                                                                                lstSize,
+                                                                            title: e
+                                                                                .key)));
+                                                          },
+                                                        ))
+                                                    .toList(),
                                               ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
+                                              const SizedBox(height: 12),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Tooltip(
+                                                    message: 'حذف',
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.delete,
+                                                          color: Colors.red),
+                                                      onPressed: () =>
+                                                          _deleteItem(index, item.id),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      )),
+                                );
+                              },
+                            )),
+                          ),
+                        ],
+                      ),
                     );
-                  } else if (state is SizeFail) {
+                  } else if (state is SizeLoadFail || state is SizeEmpty) {
                     return Container(
                       child: Center(
                         child: Padding(

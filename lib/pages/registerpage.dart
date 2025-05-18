@@ -93,13 +93,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     );
                   }(); // اجرای فوری تابع async
                 });
-              } else if (state is UserErrorState) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  // تابع async ناشناس برای استفاده از await
-                  () async {
-                    await customDialogBuilder(context, "خطا", state.message);
-                  }(); // اجرای فوری تابع async
+              }else if(state is UserDuplicate){
+                WidgetsBinding.instance.addPostFrameCallback((_)  async {
+                  await customDialogBuilder(context, "توجه", "کاربری با این شماره قبلا ثبت نام کرده.");
                 });
+              }
+              else if (state is UserErrorState) {
+                WidgetsBinding.instance.addPostFrameCallback((_)  async {
+                    await customDialogBuilder(context, "خطا", state.message);
+                });
+
               }
 
               // TODO: implement listener
@@ -294,15 +297,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                             UserModel user = UserModel(
                                                 name: _nameController.text,
                                                 family: _famiyController.text,
-                                                groupId: selectedIndex,
+                                                groupid: selectedIndex,
                                                 role: 2,
                                                 email: "test@almaseman.ir",
-                                                phoneNumber:
+                                                phonenumber:
                                                     _phonenumberController.text,
                                                 password:
                                                     _passwordController.text,
                                                 active: true,
-                                                coachCode: 1234,
+                                                coach_code: 1234,
                                             );
                                             context
                                                 .read<UsersBloc>()

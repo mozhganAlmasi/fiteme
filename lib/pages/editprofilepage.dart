@@ -74,10 +74,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _nameController.text = state.user.name;
                   _famiyController.text = state.user.family;
-                  _phonenumberController.text = state.user.phoneNumber;
-                  _coach_code = state.user.coachCode;
+                  _phonenumberController.text = state.user.phonenumber;
+                  _coach_code = state.user.coach_code;
                   _userRole = state.user.role;
-                  selectedIndex = state.user.groupId;
+                  selectedIndex = state.user.groupid;
                   selectedGroup = lstGroupname[selectedIndex - 1];
                   setState(() {});
                   () async {   }(); // اجرای فوری تابع async
@@ -256,15 +256,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                               id: userID,
                                               name: _nameController.text,
                                               family: _famiyController.text,
-                                              groupId: selectedIndex,
+                                              groupid: selectedIndex,
                                               role: _userRole,
                                               email: "test@almaseman.ir",
-                                              phoneNumber:
+                                              phonenumber:
                                               _phonenumberController.text,
                                               password:
                                               _passwordController.text,
                                                active: true,
-                                               coachCode: _coach_code
+                                               coach_code: _coach_code
 
                                           );
                                           context
