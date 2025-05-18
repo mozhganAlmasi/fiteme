@@ -267,9 +267,18 @@ class _HomePageState extends State<HomePage> {
                       child: Center(
                         child: Padding(
                           padding: const EdgeInsets.all(12),
-                          child: Text(
-                            "هیچ اطلاعاتی برای نمایش وجود ندارد ، لطفا با انتخاب گزینه افزودن ، سایز های خود را به برنامه اضافه کنید",
-                            style: CustomTextStyle.textinputdata,
+                          child: Column(
+                            children: [
+                              if(userRole ==1 ) Container(color:mzhColorThem1[3],child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("کد مربیگری شما : " + coachCode.toString(),style: CustomTextStyle.textbutton,),
+                              )),
+                              SizedBox(height: 50,),
+                              Text(
+                                "هیچ اطلاعاتی برای نمایش وجود ندارد ، لطفا با انتخاب گزینه افزودن ، سایز های خود را به برنامه اضافه کنید",
+                                style: CustomTextStyle.textinputdata,
+                              ),
+                            ],
                           ),
                         ),
                       ),

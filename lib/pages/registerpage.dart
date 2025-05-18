@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
@@ -28,16 +31,25 @@ class _RegisterPageState extends State<RegisterPage> {
   final _phonenumberController = TextEditingController();
   final _passwordController = TextEditingController();
   final _repasswordController = TextEditingController();
+  final _coachcodeController = TextEditingController();
   bool _obscureText = false;
   bool _isPolicyAccepted = false;
   String? selectedGroup;
-  int selectedIndex = 1;
-  List<bool> fieldErrors = [false, false, false, false, false];
+  int selectedIndex = 2;
+  String? selectedType;
+  int selectedIndexType = 0;
+  List<bool> fieldErrors = [false, false, false, false, false, false];
 
   final List<String> lstGroupname = [
     'ایروبیک',
     'ایروبیک فانکشنال',
     'CX',
+  ];
+
+  final List<String> lstType = [
+    ' عضو عمومی ',
+    ' عضو گروه ',
+    ' مربی ',
   ];
 
   @override
@@ -61,6 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _phonenumberController.dispose();
     _passwordController.dispose();
     _repasswordController.dispose();
+    _coachcodeController.dispose();
   }
 
   @override
@@ -76,7 +89,7 @@ class _RegisterPageState extends State<RegisterPage> {
             listener: (context, state) {
               if (state is UserCreateSuccessState) {
                 // ذخیره در cubit
-                context.read<UserinfoCubit>().login(state.userID, 2, 1234);
+                context.read<UserinfoCubit>().login(state.userID,(selectedIndexType ==2)?1:2 ,coachCodeGenerate(selectedIndexType) );
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   // تابع async ناشناس برای استفاده از await
                   () async {
@@ -93,16 +106,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     );
                   }(); // اجرای فوری تابع async
                 });
-              }else if(state is UserDuplicate){
-                WidgetsBinding.instance.addPostFrameCallback((_)  async {
-                  await customDialogBuilder(context, "توجه", "کاربری با این شماره قبلا ثبت نام کرده.");
+              } else if (state is UserDuplicate) {
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  await customDialogBuilder(context, "توجه",
+                      "کاربری با این شماره قبلا ثبت نام کرده.");
                 });
-              }
-              else if (state is UserErrorState) {
-                WidgetsBinding.instance.addPostFrameCallback((_)  async {
-                    await customDialogBuilder(context, "خطا", state.message);
+              } else if (state is UserErrorState) {
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  await customDialogBuilder(context, "خطا", state.message);
                 });
-
               }
 
               // TODO: implement listener
@@ -157,7 +169,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 Row(
                                   children: [
                                     Text(
-                                      'گروه کلاس:',
+                                      'نوع کاربری :',
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.bold),
@@ -165,21 +177,20 @@ class _RegisterPageState extends State<RegisterPage> {
                                     SizedBox(height: 20),
                                     Expanded(
                                       child: DropdownButtonFormField<String>(
-                                        value: selectedGroup,
-                                        hint: Text('انتخاب کنید'),
-                                        items: lstGroupname.map((String group) {
+                                        value: selectedType,
+                                        hint: Text(' عضو عمومی '),
+                                        items: lstType.map((String type) {
                                           return DropdownMenuItem<String>(
-                                            value: group,
-                                            child: Text(group),
+                                            value: type,
+                                            child: Text(type),
                                           );
                                         }).toList(),
                                         onChanged: (String? newValue) {
                                           setState(() {
-                                            selectedGroup = newValue;
-                                            selectedIndex = lstGroupname
-                                                    .indexOf(newValue!) +
-                                                1;
-                                            print(selectedIndex.toString());
+                                            selectedType = newValue;
+                                            selectedIndexType = lstType.indexOf(newValue!) ;
+
+                                            print(selectedIndexType.toString());
                                           });
                                         },
                                         decoration: InputDecoration(
@@ -200,6 +211,88 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 20),
+                                if (selectedIndexType == 1)
+                                  Column(
+                                    children: [
+                                      ShakeWidget(
+                                        shake: fieldErrors[5],
+                                        child: TextFormField(
+                                          controller: _coachcodeController,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.digitsOnly,       // فقط عدد
+                                            LengthLimitingTextInputFormatter(4),          // حداکثر ۴ رقم
+                                          ],
+                                          decoration: InputDecoration(
+                                            labelText: ' کد مربی',
+                                            border: OutlineInputBorder(),
+                                          ),
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'کد مربی را وارد کنید';
+                                            }else if (value.length != 4) {
+                                              return 'کد باید دقیقاً ۴ رقم باشد';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'گروه کلاس:',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Expanded(
+                                            child:
+                                                DropdownButtonFormField<String>(
+                                              value: selectedGroup,
+                                              hint: Text('انتخاب کنید'),
+                                              items: lstGroupname
+                                                  .map((String group) {
+                                                return DropdownMenuItem<String>(
+                                                  value: group,
+                                                  child: Text(group),
+                                                );
+                                              }).toList(),
+                                              onChanged: (String? newValue) {
+                                                setState(() {
+                                                  selectedGroup = newValue;
+                                                  selectedIndex = lstGroupname
+                                                          .indexOf(newValue!) +
+                                                      1;
+                                                  print(
+                                                      selectedIndex.toString());
+                                                });
+                                              },
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor:
+                                                    Colors.purple.shade50,
+                                                // بنفش کم‌رنگ
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 10),
+                                                border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  borderSide: BorderSide.none,
+                                                ),
+                                              ),
+                                              dropdownColor: Colors.purple
+                                                  .shade50, // پس‌زمینه لیست
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 SizedBox(
                                   height: 20,
                                 ),
@@ -284,29 +377,37 @@ class _RegisterPageState extends State<RegisterPage> {
                                             fieldErrors = [
                                               _nameController.text.isEmpty,
                                               _famiyController.text.isEmpty,
-                                              _phonenumberController.text.isEmpty,
+                                              _phonenumberController
+                                                  .text.isEmpty,
                                               _passwordController.text.isEmpty,
-                                              _repasswordController.text.isEmpty,
+                                              _repasswordController
+                                                  .text.isEmpty,
+                                              (selectedIndexType == 1)
+                                                  ? _coachcodeController
+                                                      .text.isEmpty
+                                                  : true
                                             ];
                                           });
                                           if (!_isPolicyAccepted) {
                                             _isPolicyAccepted =
                                                 await showPrivacyPolicyDialog(
                                                     context);
-                                          } else if(isValid){
+                                          } else if (isValid) {
                                             UserModel user = UserModel(
                                                 name: _nameController.text,
                                                 family: _famiyController.text,
-                                                groupid: selectedIndex,
-                                                role: 2,
+                                                groupid:groupIdGenerate(selectedIndex) ,
+                                                role: (selectedIndexType == 2)
+                                                    ? 1
+                                                    : 2,
                                                 email: "test@almaseman.ir",
                                                 phonenumber:
                                                     _phonenumberController.text,
                                                 password:
                                                     _passwordController.text,
                                                 active: true,
-                                                coach_code: 1234,
-                                            );
+                                                coach_code: coachCodeGenerate(
+                                                    selectedIndexType));
                                             context
                                                 .read<UsersBloc>()
                                                 .add(CreateUserEvent(user));
@@ -426,7 +527,24 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       },
     );
-
     return _isPolicyAccepted;
+  }
+
+  int coachCodeGenerate(int selectIndexType) {
+    if (selectedIndexType == 2) {
+      final random = Random();
+      return 1000 + random.nextInt(9000); // عددی بین 1000 تا 9999
+    } else if (selectedIndexType == 1) {
+      return int.parse(_coachcodeController.text);
+    }
+    return 0;
+  }
+  int groupIdGenerate(int selectedGroup) {
+    if (selectedIndexType == 2) {
+      return 0;
+    } else if (selectedIndexType == 1) {
+      return selectedGroup;
+    }
+    return 0;
   }
 }
