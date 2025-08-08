@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "580696777688",
+    "project_id": "fitme-cac8e",
+    "storage_bucket": "fitme-cac8e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:580696777688:android:cde4b11996120e413988ad",
+        "android_client_info": {
+          "package_name": "ir.almaseman.shahrzad"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzzCKKTgD3RPowUHO6mb2q_sF-D2Ih_QE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
