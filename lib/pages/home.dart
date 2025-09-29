@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (context) => UsersBloc()..add(GetUserEvant(userID)),
+            create: (context) => UsersBloc()..add(UserGetEvant(userID)),
             child: EditProfilePage(),
           ),
         ),
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (context) => UsersBloc()..add(LoadUsersEvent(coachCode)),
+            create: (context) => UsersBloc()..add(UsersLoadEvent(coachCode)),
             child: AdminPage(),
           ),
         ),

@@ -246,7 +246,7 @@ class _AdminPageState extends State<AdminPage> {
                                                           context
                                                               .read<UsersBloc>()
                                                               .add(
-                                                                (UpdateUserEvent(
+                                                                (UserUpdateEvent(
                                                                   user,
                                                                 )),
                                                               );

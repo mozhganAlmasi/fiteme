@@ -4,22 +4,26 @@ part of 'users_bloc.dart';
 @immutable
 sealed class UsersEvent {}
 
-class LoadUsersEvent extends UsersEvent {
+class UsersLoadEvent extends UsersEvent {
   final int coachCode;
-  LoadUsersEvent(this.coachCode);
+  UsersLoadEvent(this.coachCode);
 }
-class GetUserEvant extends UsersEvent {
+class UserGetEvant extends UsersEvent {
   final String userID;
-  GetUserEvant(this.userID);
+  UserGetEvant(this.userID);
 }
-class CreateUserEvent extends UsersEvent {
+class UserCreateEvent extends UsersEvent {
   final UserModel user;
-  CreateUserEvent(this.user);
+  UserCreateEvent(this.user);
 }
 
-class UpdateUserEvent extends UsersEvent {
+class UserUpdateEvent extends UsersEvent {
   final UserModel updatedUser;
-  UpdateUserEvent( this.updatedUser);
+  UserUpdateEvent( this.updatedUser);
+}
+class UserCheckCoachCodeEvent extends UsersEvent{
+  final int coachCode;
+  UserCheckCoachCodeEvent(this.coachCode);
 }
 
 class DeleteUserEvent extends UsersEvent {

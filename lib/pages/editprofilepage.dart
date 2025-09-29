@@ -269,7 +269,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           );
                                           context
                                               .read<UsersBloc>()
-                                              .add((UpdateUserEvent(user)));
+                                              .add((UserUpdateEvent(user)));
                                         },
                                         child: Text("ویرایش",
                                             style: CustomTextStyle.textbutton),

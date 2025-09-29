@@ -410,7 +410,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 );
                 context.read<UsersBloc>().add(
-                  CreateUserEvent(user),
+                  UserCreateEvent(user),
                 );
               }
             },

@@ -13,7 +13,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     on<UsersEvent>((event, emit) {
       // TODO: implement event handler
     });
-    on<LoadUsersEvent>((event, emit) async {
+    on<UsersLoadEvent>((event, emit) async {
       emit(UserLoadingState());
       try {
         final users = await UserRepository.getAllUsers(event.coachCode);
@@ -23,7 +23,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       }
     });
 
-    on<GetUserEvant>((event, emit) async {
+    on<UserGetEvant>((event, emit) async {
       emit(UserLoadingState());
       try {
         final users = await UserRepository.getUser(event.userID);
@@ -33,7 +33,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       }
     });
 
-    on<CreateUserEvent>((event, emit) async {
+    on<UserCreateEvent>((event, emit) async {
       try {
         emit(UserLoadingState());
         final userID= await UserRepository.createUser(event.user);
@@ -46,7 +46,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       }
     });
 
-    on<UpdateUserEvent>((event, emit) async {
+    on<UserUpdateEvent>((event, emit) async {
       try {
         await UserRepository.updateUser( event.updatedUser);
         emit(UpdateUserSuccessState());
@@ -81,7 +81,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     });
   }
   Future<void> _onGetUserEvent(
-      GetUserEvant event, Emitter<UsersState> emit) async {
+      UserGetEvant event, Emitter<UsersState> emit) async {
     emit(UserLoadingState());
     try {
       final users = await UserRepository.getUser(event.userID);
