@@ -70,7 +70,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           color: mzhColorThem1[0], // رنگ پس‌زمینه کل صفحه
           child: BlocListener<UsersBloc, UsersState>(
             listener: (context, state) {
-              if (state is GetUserSuccessState) {
+              if (state is UserGetSuccessState) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   _nameController.text = state.user.name;
                   _famiyController.text = state.user.family;
@@ -98,7 +98,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                             builder: (_) => BlocProvider(
-                              create: (context) => SizesBloc()..add(LoadSizes(userID)),
+                              create: (context) => SizesBloc()..add(SizesLoadEvent(userID)),
                               child: HomePage(),
                             )),
                       );
@@ -288,7 +288,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           Navigator.of(context).pushReplacement(
                                             MaterialPageRoute(
                                                 builder: (_) => BlocProvider(
-                                                  create: (context) => SizesBloc()..add(LoadSizes(userID)),
+                                                  create: (context) => SizesBloc()..add(SizesLoadEvent(userID)),
                                                   child: HomePage(),
                                                 )),
                                           );

@@ -11,15 +11,15 @@ class UserLoadedState extends UsersState {
   final List<UserModel> users;
   UserLoadedState(this.users);
 }
-class GetUserSuccessState extends UsersState {
+class UserGetSuccessState extends UsersState {
   UserModel user;
-  GetUserSuccessState(this.user);
+  UserGetSuccessState(this.user);
 }
-class DeletUserSuccessState extends UsersState {
+class UserDeletSuccessState extends UsersState {
 }
-class DeletUserFailState extends UsersState {
+class UserDeletFailState extends UsersState {
   String msg;
-  DeletUserFailState(this.msg);
+  UserDeletFailState(this.msg);
 }
 class UpdateUserSuccessState extends UsersState {
 }

@@ -103,7 +103,7 @@ class ShowChartPage extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) => BlocProvider(
                               create: (context) =>
-                                  SizesBloc()..add(LoadSizes(userID)),
+                                  SizesBloc()..add(SizesLoadEvent(userID)),
                               child: HomePage(),
                             )));
               },

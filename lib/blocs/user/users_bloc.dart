@@ -27,7 +27,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
       emit(UserLoadingState());
       try {
         final users = await UserRepository.getUser(event.userID);
-        emit(GetUserSuccessState(users));
+        emit(UserGetSuccessState(users));
       } catch (e) {
         emit(UserErrorState(e.toString()));
       }
@@ -35,6 +35,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
     on<CreateUserEvent>((event, emit) async {
       try {
+        emit(UserLoadingState());
         final userID= await UserRepository.createUser(event.user);
        if(userID == "Duplicate ")
            emit(UserDuplicate());
@@ -57,9 +58,9 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     on<DeleteUserEvent>((event, emit) async {
       try {
         await UserRepository.deleteUser(event.phoneNumber);
-        emit(DeletUserSuccessState());
+        emit(UserDeletSuccessState());
       } catch (e) {
-        emit(DeletUserFailState(e.toString()));
+        emit(UserDeletFailState(e.toString()));
       }
     });
 
@@ -78,5 +79,15 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
         emit(UserErrorState(e.toString()));
       }
     });
+  }
+  Future<void> _onGetUserEvent(
+      GetUserEvant event, Emitter<UsersState> emit) async {
+    emit(UserLoadingState());
+    try {
+      final users = await UserRepository.getUser(event.userID);
+      emit(UserGetSuccessState(users));
+    } catch (e) {
+      emit(UserErrorState(e.toString()));
+    }
   }
 }

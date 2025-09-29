@@ -12,11 +12,11 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
     on<SizesEvent>((event, emit) {
       // TODO: implement event handler
     });
-    on<LoadingSize>((event, emit) async {
+    on<SizeLoadingEvent>((event, emit) async {
       emit(SizeLoading());
     });
 
-    on<CreateSize>((event, emit) async {
+    on<SizeCreateEvent>((event, emit) async {
       try {
         await SizeRepository.createSize(event.Size);
         emit(SizeCreateSuccess());
@@ -25,7 +25,7 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
       }
     });
 
-    on<LoadSizes>((event, emit) async {
+    on<SizesLoadEvent>((event, emit) async {
       try {
         emit(SizeLoading());
         List<SizeModel> result =  await SizeRepository.fetchSize(event.userID);
@@ -40,7 +40,7 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
       }
     });
 
-    on<DeleteSize>((event , emit) async{
+    on<SizeDeletEvent>((event , emit) async{
       try{
         await SizeRepository.deletSize(event.userID, event.rowID);
         emit(SizeDeletSuccess(event.rowID));

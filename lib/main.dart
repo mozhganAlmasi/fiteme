@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shahrzad/blocs/category/category_bloc.dart';
 import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,16 +14,16 @@ import 'cubit/userinfo_cubit.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  var message = FirebaseMessaging.instance;
-  var token = await message.getToken();
-  FirebaseMessaging.onMessage.listen((event){
-    print("My message recieved ${event.data} : ${event.notification!.title}");
-  });
-  FirebaseMessaging.onMessageOpenedApp.listen((event){
-    print("My message click");
-  });
-  print("My user token : ${token}" );
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // var message = FirebaseMessaging.instance;
+  // var token = await message.getToken();
+  // FirebaseMessaging.onMessage.listen((event){
+  //   print("My message recieved ${event.data} : ${event.notification!.title}");
+  // });
+  // FirebaseMessaging.onMessageOpenedApp.listen((event){
+  //   print("My message click");
+  // });
+  // print("My user token : ${token}" );
   runApp(
     BlocProvider(
       create: (context) => ConnectivityBloc(Connectivity()),
@@ -30,6 +31,7 @@ Future<void> main() async{
         providers: [
           BlocProvider(create: (context) => UsersBloc()),
           BlocProvider(create: (context) => UserinfoCubit()),
+          BlocProvider(create: (context)=>CategoryBloc()),
         ],
         child: const MyApp(),
       ),

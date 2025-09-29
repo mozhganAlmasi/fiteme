@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shahrzad/blocs/category/category_bloc.dart';
 import 'package:shahrzad/blocs/size/sizes_bloc.dart';
 import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
@@ -10,6 +11,7 @@ import 'package:shahrzad/pages/addsizepage.dart';
 import 'package:shahrzad/pages/adminpage.dart';
 import 'package:shahrzad/pages/editprofilepage.dart';
 import 'package:shahrzad/pages/loginpage.dart';
+import 'package:shahrzad/pages/manageCategory.dart';
 import 'package:shahrzad/pages/showchartpage.dart';
 import '../classes/appexisthandler.dart';
 import '../cubit/userinfo_cubit.dart';
@@ -62,28 +64,42 @@ class _HomePageState extends State<HomePage> {
 
     if (confirm == true) {
       // فقط در صورتی حذف کن که کاربر تأیید کرده باشه
-      context.read<SizesBloc>().add(DeleteSize(userID, rowID));
+      context.read<SizesBloc>().add(SizeDeletEvent(userID, rowID));
     }
   }
 
   void _onMenuSelected(BuildContext context, String value) {
     if (value == 'edit_profile') {
       Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                    create: (context) => UsersBloc()..add(GetUserEvant(userID)),
-                    child: EditProfilePage( ),
-                  )));
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => UsersBloc()..add(GetUserEvant(userID)),
+            child: EditProfilePage(),
+          ),
+        ),
+      );
     } else if (value == 'manag_users') {
       Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => BlocProvider(
-                    create: (context) => UsersBloc()..add(LoadUsersEvent(coachCode)),
-                    child: AdminPage(),
-                  )));
-    }else if (value == 'exit') {
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => UsersBloc()..add(LoadUsersEvent(coachCode)),
+            child: AdminPage(),
+          ),
+        ),
+      );
+    } else if (value == 'manag_category') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => CategoryBloc()..add(LoadCategoryEvent(coachCode)),
+            child: Managecategory(coachCode),
+          ),
+        ),
+      );
+    } else if (value == 'exit') {
       AppExitHandler.exitApp(context, loginPage: LoginPage());
     }
   }
@@ -106,10 +122,12 @@ class _HomePageState extends State<HomePage> {
                   value: 'manag_users',
                   child: Text('مدیریت لیست کاربران'),
                 ),
-              PopupMenuItem(
-                value: 'exit',
-                child: Text(' خروج'),
-              ),
+              if (userRole == 1)
+                PopupMenuItem(
+                  value: 'manag_category',
+                  child: Text('مدیریت لیست گروه بندی'),
+                ),
+              PopupMenuItem(value: 'exit', child: Text(' خروج')),
             ],
           ),
         ],
@@ -129,19 +147,25 @@ class _HomePageState extends State<HomePage> {
                     // تابع async ناشناس برای استفاده از await
                     () async {
                       await customDialogBuilder(
-                          context, "تبریک", "حذف با موفقیت انجام شد");
+                        context,
+                        "تبریک",
+                        "حذف با موفقیت انجام شد",
+                      );
 
                       setState(() {
                         lstSize.removeWhere((item) => item.id == state.rowID);
                       });
                     }(); // اجرای فوری تابع async
                   });
-                }else if (state is SizeDeleteFail) {
+                } else if (state is SizeDeleteFail) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     // تابع async ناشناس برای استفاده از await
                     () async {
                       await customDialogBuilder(
-                      context, "خطا", "مشکلی در حذف اندازه پیش آمده");
+                        context,
+                        "خطا",
+                        "مشکلی در حذف اندازه پیش آمده",
+                      );
                     }(); // اجرای فوری تابع async
                   });
                 }
@@ -165,99 +189,130 @@ class _HomePageState extends State<HomePage> {
                       color: mzhColorThem1[2],
                       child: Column(
                         children: [
-                          if(userRole ==1 ) Container(color:mzhColorThem1[3],child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("کد مربیگری شما : " + coachCode.toString(),style: CustomTextStyle.textbutton,),
-                          )),
+                          if (userRole == 1)
+                            Container(
+                              color: mzhColorThem1[3],
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "کد مربیگری شما : " + coachCode.toString(),
+                                  style: CustomTextStyle.textbutton,
+                                ),
+                              ),
+                            ),
                           Expanded(
-
                             child: AnimationLimiter(
-                                child: ListView.builder(
-                              itemCount: lstSize.length,
-                              padding: const EdgeInsets.all(12),
-                              itemBuilder: (context, index) {
-                                final item = lstSize[index];
-                                return AnimationConfiguration.staggeredList(
-                                  position: index,
-                                  duration: const Duration(milliseconds: 400),
-                                  child: SlideAnimation(
-                                    verticalOffset: 50,
-                                    child: FadeInAnimation(
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(20)),
-                                        elevation: 6,
-                                        margin: EdgeInsets.symmetric(vertical: 10),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Text(
+                              child: ListView.builder(
+                                itemCount: lstSize.length,
+                                padding: const EdgeInsets.all(12),
+                                itemBuilder: (context, index) {
+                                  final item = lstSize[index];
+                                  return AnimationConfiguration.staggeredList(
+                                    position: index,
+                                    duration: const Duration(milliseconds: 400),
+                                    child: SlideAnimation(
+                                      verticalOffset: 50,
+                                      child: FadeInAnimation(
+                                        child: Card(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          elevation: 6,
+                                          margin: EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: [
+                                                Text(
                                                   'تاریخ اندازه گیری : ${item.dateInsert}',
                                                   style: GoogleFonts.vazirmatn(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.bold)),
-                                              const SizedBox(height: 10),
-                                              Wrap(
-                                                spacing: 10,
-                                                runSpacing: 6,
-                                                children: item
-                                                    .toDisplayMap()
-                                                    .entries
-                                                    .map((e) => ActionChip(
-                                                          avatar: Icon(Icons.insights,
-                                                              size: 20,
-                                                              color: Colors.purple),
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Wrap(
+                                                  spacing: 10,
+                                                  runSpacing: 6,
+                                                  children: item
+                                                      .toDisplayMap()
+                                                      .entries
+                                                      .map(
+                                                        (e) => ActionChip(
+                                                          avatar: Icon(
+                                                            Icons.insights,
+                                                            size: 20,
+                                                            color:
+                                                                Colors.purple,
+                                                          ),
                                                           label: Text(
-                                                              '${e.key}: ${e.value.toString()} cm',
-                                                              style: GoogleFonts
-                                                                  .vazirmatn(
-                                                                      fontSize: 14)),
+                                                            '${e.key}: ${e.value.toString()} cm',
+                                                            style:
+                                                                GoogleFonts.vazirmatn(
+                                                                  fontSize: 14,
+                                                                ),
+                                                          ),
                                                           backgroundColor:
-                                                              Colors.teal.shade50,
+                                                              Colors
+                                                                  .teal
+                                                                  .shade50,
                                                           onPressed: () {
                                                             Navigator.pushReplacement(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                    builder: (context) =>
-                                                                        ShowChartPage(
-                                                                            userID:
-                                                                                userID,
-                                                                            lstSize:
-                                                                                lstSize,
-                                                                            title: e
-                                                                                .key)));
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    ShowChartPage(
+                                                                      userID:
+                                                                          userID,
+                                                                      lstSize:
+                                                                          lstSize,
+                                                                      title:
+                                                                          e.key,
+                                                                    ),
+                                                              ),
+                                                            );
                                                           },
-                                                        ))
-                                                    .toList(),
-                                              ),
-                                              const SizedBox(height: 12),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  Tooltip(
-                                                    message: 'حذف',
-                                                    child: IconButton(
-                                                      icon: Icon(Icons.delete,
-                                                          color: Colors.red),
-                                                      onPressed: () =>
-                                                          _deleteItem(index, item.id),
+                                                        ),
+                                                      )
+                                                      .toList(),
+                                                ),
+                                                const SizedBox(height: 12),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Tooltip(
+                                                      message: 'حذف',
+                                                      child: IconButton(
+                                                        icon: Icon(
+                                                          Icons.delete,
+                                                          color: Colors.red,
+                                                        ),
+                                                        onPressed: () =>
+                                                            _deleteItem(
+                                                              index,
+                                                              item.id,
+                                                            ),
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
-                                              )
-                                            ],
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            )),
+                                  );
+                                },
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -269,11 +324,19 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             children: [
-                              if(userRole ==1 ) Container(color:mzhColorThem1[3],child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text("کد مربیگری شما : " + coachCode.toString(),style: CustomTextStyle.textbutton,),
-                              )),
-                              SizedBox(height: 50,),
+                              if (userRole == 1)
+                                Container(
+                                  color: mzhColorThem1[3],
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "کد مربیگری شما : " +
+                                          coachCode.toString(),
+                                      style: CustomTextStyle.textbutton,
+                                    ),
+                                  ),
+                                ),
+                              SizedBox(height: 50),
                               Text(
                                 "هیچ اطلاعاتی برای نمایش وجود ندارد ، لطفا با انتخاب گزینه افزودن ، سایز های خود را به برنامه اضافه کنید",
                                 style: CustomTextStyle.textinputdata,
@@ -295,12 +358,14 @@ class _HomePageState extends State<HomePage> {
         tooltip: "افزودن",
         onPressed: () {
           Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => BlocProvider(
-                        create: (context) => SizesBloc(),
-                        child: AddsizePage(userID: userID),
-                      )));
+            context,
+            MaterialPageRoute(
+              builder: (context) => BlocProvider(
+                create: (context) => SizesBloc(),
+                child: AddsizePage(userID: userID),
+              ),
+            ),
+          );
         },
         child: Icon(Icons.add),
       ),

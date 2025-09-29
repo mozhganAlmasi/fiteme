@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
                           MaterialPageRoute(
                               builder: (_) => BlocProvider(
                                 create: (context) =>
-                                SizesBloc()..add(LoadSizes(state.user.id!)),
+                                SizesBloc()..add(SizesLoadEvent(state.user.id!)),
                                 child: HomePage(),
                               )),
                         );

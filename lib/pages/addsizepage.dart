@@ -280,7 +280,7 @@ class _AddsizePageState extends State<AddsizePage> {
                                             );
                                             context
                                                 .read<SizesBloc>()
-                                                .add(CreateSize(size));
+                                                .add(SizeCreateEvent(size));
                                           }
 
                                         },
@@ -299,7 +299,7 @@ class _AddsizePageState extends State<AddsizePage> {
                                           Navigator.pushReplacement(
                                               context,  MaterialPageRoute(
                                               builder: (_) => BlocProvider(
-                                                create: (context) => SizesBloc()..add(LoadSizes( widget.userID)),
+                                                create: (context) => SizesBloc()..add(SizesLoadEvent( widget.userID)),
                                                 child: HomePage(),
                                               )));
 

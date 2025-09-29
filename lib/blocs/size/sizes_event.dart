@@ -3,30 +3,30 @@ part of 'sizes_bloc.dart';
 @immutable
 sealed class SizesEvent {}
 
-class LoadingSize extends SizesEvent {
+class SizeLoadingEvent extends SizesEvent {
 
 }
 
-class LoadSizes extends SizesEvent {
+class SizesLoadEvent extends SizesEvent {
   final String userID;
-  LoadSizes(this.userID);
+  SizesLoadEvent(this.userID);
 }
 
-class CreateSize extends SizesEvent {
+class SizeCreateEvent extends SizesEvent {
   final SizeModel Size;
-  CreateSize(this.Size);
+  SizeCreateEvent(this.Size);
 }
 
-class UpdateSize extends SizesEvent {
+class SizeUpdateEvent extends SizesEvent {
   final String userID;
   final SizeModel updatedSize;
-  UpdateSize(this.userID, this.updatedSize);
+  SizeUpdateEvent(this.userID, this.updatedSize);
 }
 
-class DeleteSize extends SizesEvent {
+class SizeDeletEvent extends SizesEvent {
   final String userID ;
   final int rowID;
-  DeleteSize(this.userID , this.rowID) ;
+  SizeDeletEvent(this.userID , this.rowID) ;
 }
 
 class ErrorSizesEvent extends SizesEvent {}
