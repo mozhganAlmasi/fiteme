@@ -16,12 +16,12 @@ Future<String?> getToken() async {
 }
 
 class UserRepository {
-  static final String sizeBaseUrl = Constants.baseUrl + '/users';
+  static final String userBaseUrl = Constants.baseUrl + '/users';
 
   static Future<List<UserModel>> getAllUsers(int coachCode) async {
     try {
       final response = await http
-          .get(Uri.parse('$sizeBaseUrl/listusers?coach_code=$coachCode'))
+          .get(Uri.parse('$userBaseUrl/listusers?coach_code=$coachCode'))
           .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final List data = json.decode(response.body);
@@ -38,7 +38,7 @@ class UserRepository {
     try {
       final response = await http
           .post(
-            Uri.parse('$sizeBaseUrl/register'),
+            Uri.parse('$userBaseUrl/register'),
             headers: {'Content-Type': 'application/json'},
 
             body: json.encode(user.toJson()), // id ارسال نمی‌شود
@@ -46,6 +46,9 @@ class UserRepository {
           .timeout(const Duration(seconds: 10));
       if (response.statusCode == 400) {
         return "Duplicate ";
+      }
+      if (response.statusCode == 401) {
+        return "coachDuplicate ";
       }
       final responseData = json.decode(response.body);
       if (response.statusCode != 200) {
@@ -71,7 +74,7 @@ class UserRepository {
         'active': updatedUser.active,
       };
       final response = await http.put(
-        Uri.parse('$sizeBaseUrl/update'),
+        Uri.parse('$userBaseUrl/update'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(data),
       );
@@ -86,7 +89,7 @@ class UserRepository {
   static Future<void> deleteUser(String phoneNumber) async {
     try {
       final response = await http.delete(
-        Uri.parse('$sizeBaseUrl/delete'),
+        Uri.parse('$userBaseUrl/delete'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'phonenumber': phoneNumber}),
       );
@@ -101,7 +104,7 @@ class UserRepository {
   static Future<UserModel> getUser(String userid) async {
     try {
       final response = await http.get(
-        Uri.parse('$sizeBaseUrl/getuser?id=$userid'),
+        Uri.parse('$userBaseUrl/getuser?id=$userid'),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode != 200) {
@@ -121,7 +124,7 @@ class UserRepository {
     try {
       final response = await http
           .post(
-            Uri.parse('$sizeBaseUrl/login'),
+            Uri.parse('$userBaseUrl/login'),
             headers: {'Content-Type': 'application/json'},
             body: json.encode({
               'phonenumber': phoneNumber,

@@ -17,6 +17,10 @@ class UserGetSuccessState extends UsersState {
 }
 class UserDeletSuccessState extends UsersState {
 }
+class UserCheckCoachCodeState extends UsersState{
+  final bool isExist;
+  UserCheckCoachCodeState(this.isExist);
+}
 class UserDeletFailState extends UsersState {
   String msg;
   UserDeletFailState(this.msg);
@@ -34,6 +38,9 @@ class UserCreateSuccessState extends UsersState {
   UserCreateSuccessState(this.userID);
 }
 class UserDuplicate extends UsersState{
+
+}
+class CoachDuplicate extends UsersState{
 
 }
 class UserErrorState extends UsersState {

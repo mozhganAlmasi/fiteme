@@ -34,6 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _phonenumberController = TextEditingController();
   final _passwordController = TextEditingController();
   final _repasswordController = TextEditingController();
+  final _coachCodeController = TextEditingController();
 
   late Size size;
 
@@ -77,6 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _phonenumberController.dispose();
     _passwordController.dispose();
     _repasswordController.dispose();
+    _coachCodeController.dispose();
   }
 
   @override
@@ -92,61 +94,75 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               buildUIWithoutButton(),
               BlocConsumer<UsersBloc, UsersState>(
-                  builder: (context , state){
-                    return buildUIButton();
-                  },
-                  listener: (context, state) {
-                    if (state is UserLoadingState) {
-                      dialogLoading = true ;
-
-                    } else if (state is UserCreateSuccessState) {
-                      dialogLoading = false ;
-                      // ذخیره در cubit
-                      context.read<UserinfoCubit>().login(
-                        state.userID,
-                        (selectedTypeIndex == 2) ? 1 : 2,
-                        coachCodeGenerate(selectedTypeIndex),
-                      );
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        // تابع async ناشناس برای استفاده از await
-                        () async {
-                          await customDialogBuilder(
-                          context,
-                          "تبریک",
-                          "شما با موفقیت ثبت نام کردید",
-                          );
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => BlocProvider(
-                                create: (context) =>
-                                SizesBloc()..add(SizesLoadEvent(state.userID)),
-                                child: HomePage(),
-                              ),
-                            ),
-                          );
-                        }(); // اجرای فوری تابع async
-                      });
-                    } else if (state is UserDuplicate) {
-                      dialogLoading = false ;
-                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                builder: (context, state) {
+                  return buildUIButton();
+                },
+                listener: (context, state) {
+                  if (state is UserLoadingState) {
+                    dialogLoading = true;
+                  } else if (state is UserCreateSuccessState) {
+                    dialogLoading = false;
+                    // ذخیره در cubit
+                    context.read<UserinfoCubit>().login(
+                      state.userID,
+                      (selectedTypeIndex == 2) ? 1 : 2,
+                      coachCodeGenerate(selectedTypeIndex),
+                    );
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      // تابع async ناشناس برای استفاده از await
+                      () async {
                         await customDialogBuilder(
-                          context,
-                          "توجه",
-                          "کاربری با این شماره قبلا ثبت نام کرده.",
+                          context ,
+                          "تبریک" ,
+                          "شما با موفقیت ثبت نام کردید" ,
                         );
-                      });
-                    } else if (state is UserErrorState) {
-                      dialogLoading = false ;
-                      WidgetsBinding.instance.addPostFrameCallback((_) async {
-                        await customDialogBuilder(context, "خطا", "خطا در اتصال به سرور");
-                      });
-                    }
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => BlocProvider(
+                              create: (context) =>
+                                  SizesBloc()
+                                    ..add(SizesLoadEvent(state.userID)),
+                              child: HomePage(),
+                            ),
+                          ),
+                        );
+                      }(); // اجرای فوری تابع async
+                    });
+                  } else if (state is UserDuplicate) {
+                    dialogLoading = false;
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      await customDialogBuilder(
+                        context ,
+                        "توجه" ,
+                        "کاربری با این شماره قبلا ثبت نام کرده." ,
+                      );
+                    });
+                  } else if (state is CoachDuplicate) {
+                    dialogLoading = false;
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      await customDialogBuilder(
+                        context ,
+                        "توجه" ,
+                        "کد مربی گری شما تکراری است " ,
+                      );
+                    });
+                  } else if (state is UserErrorState) {
+                    dialogLoading = false;
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      await customDialogBuilder(
+                        context ,
+                        "خطا" ,
+                        "خطا در اتصال به سرور" ,
+                      );
+                    });
+                  }
 
-                    // TODO: implement listener
-                  },),
+                  // TODO: implement listener
+                },
+              ),
               buildUIPrivacyPOlicy(),
             ],
-          )
+          ),
         ),
       ),
     );
@@ -216,6 +232,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             }).toList(),
                             onChanged: (String? newValue) {
                               changeUserType(newValue);
+                              _coachCodeController.text = generateRandomNumber().toString();
                             },
                             decoration: InputDecoration(
                               filled: true,
@@ -310,6 +327,28 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                       ),
                     ),
+                    SizedBox(height: 20),
+                    // شماره موبایل
+                    if (selectedTypeIndex == 2)
+                      ShakeWidget(
+                        shake: fieldErrors[2],
+                        child: TextFormField(
+                          controller: _coachCodeController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'کد چهار رقمی اختصاصی مربی',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'کد چهار رقمی به دلخواه وارد کنید';
+                            } else if (!RegExp(r'^\d{4}$').hasMatch(value)) {
+                              return 'یک عدد چهار رقمی وارد کنید .';
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
                     const SizedBox(height: 20),
                     // رمز عبور
                     ShakeWidget(
@@ -353,7 +392,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     ),
                     const SizedBox(height: 40),
-
                   ],
                 ),
               ),
@@ -364,7 +402,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget buildUIButton(){
+  Widget buildUIButton() {
     return Container(
       width: double.infinity,
       child: Row(
@@ -373,10 +411,7 @@ class _RegisterPageState extends State<RegisterPage> {
           //دکمه ثبت نام
           ElevatedButton(
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 18,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
               backgroundColor: mzhColorThem1[5],
               foregroundColor: mzhColorThem1[2],
               side: BorderSide(color: mzhColorThem1[2]),
@@ -393,8 +428,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ];
               });
               if (!_isPolicyAccepted) {
-                _isPolicyAccepted =
-                await showPrivacyPolicyDialog(context);
+                _isPolicyAccepted = await showPrivacyPolicyDialog(context);
               } else if (isValid) {
                 UserModel user = UserModel(
                   name: _nameController.text,
@@ -405,19 +439,18 @@ class _RegisterPageState extends State<RegisterPage> {
                   phonenumber: _phonenumberController.text,
                   password: _passwordController.text,
                   active: true,
-                  coach_code: coachCodeGenerate(
-                    selectedTypeIndex,
-                  ),
+                  coach_code: coachCodeGenerate(selectedTypeIndex),
                 );
-                context.read<UsersBloc>().add(
-                  UserCreateEvent(user),
-                );
+                context.read<UsersBloc>().add(UserCreateEvent(user));
               }
             },
-            child: (dialogLoading)?SizedBox(height: 20,width: 20,child: CircularProgressIndicator(),):Text(
-              "ثبت111 نام",
-              style: CustomTextStyle.textbutton,
-            ),
+            child: (dialogLoading)
+                ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(),
+                  )
+                : Text("ثبت نام", style: CustomTextStyle.textbutton),
           ),
           // دکمه بازگشت
           ElevatedButton(
@@ -440,18 +473,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               );
             },
-            child: Text(
-              "بازگشت",
-              style: CustomTextStyle.textbutton,
-            ),
+            child: Text("بازگشت", style: CustomTextStyle.textbutton),
           ),
         ],
       ),
     );
   }
-  Widget buildUIPrivacyPOlicy(){
+
+  Widget buildUIPrivacyPOlicy() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8,12,8,12),
+      padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
       child: RichText(
         textAlign: TextAlign.center,
         text: TextSpan(
@@ -461,9 +492,7 @@ class _RegisterPageState extends State<RegisterPage> {
             height: 1.5,
           ),
           children: [
-            const TextSpan(
-              text: "ورود یا ثبت نام شما به معنای پذیرفتن تمام  ",
-            ),
+            const TextSpan(text: "ورود یا ثبت نام شما به معنای پذیرفتن تمام  "),
             TextSpan(
               text: "قوانین حریم خصوصی",
               style: const TextStyle(
@@ -557,12 +586,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
   int coachCodeGenerate(int selectIndexType) {
     if (selectedTypeIndex == 2) {
-      final random = Random();
-      return 1000 + random.nextInt(9000); // عددی بین 1000 تا 9999
+      return int.parse(_coachCodeController.text);
     } else if (selectedTypeIndex == 1) {
       return coachCode;
     }
     return 0;
+  }
+
+  int generateRandomNumber() {
+    final random = Random();
+    return 1000 + random.nextInt(9000); // عددی بین 1000 تا 9999
   }
 
   int groupIdGenerate(int selectedIndex) {
