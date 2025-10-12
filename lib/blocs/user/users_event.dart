@@ -8,9 +8,9 @@ class UsersLoadEvent extends UsersEvent {
   final int coachCode;
   UsersLoadEvent(this.coachCode);
 }
-class UserGetEvant extends UsersEvent {
+class UserGetEvent extends UsersEvent {
   final String userID;
-  UserGetEvant(this.userID);
+  UserGetEvent(this.userID);
 }
 class UserCreateEvent extends UsersEvent {
   final UserModel user;

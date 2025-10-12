@@ -27,10 +27,10 @@ class UserRepository {
         final List data = json.decode(response.body);
         return data.map((e) => UserModel.fromJson(e)).toList();
       } else {
-        throw Exception('خطا در خواندن اطلاعات کاربر');
+        throw Exception('خطا در دریافت لیست کاربران');
       }
     } catch (e) {
-      throw Exception('خطا در خواندن اطلاعات کاربر');
+      throw Exception('خطا در دریافت لیست کاربران');
     }
   }
 
@@ -45,10 +45,10 @@ class UserRepository {
           )
           .timeout(const Duration(seconds: 10));
       if (response.statusCode == 400) {
-        return "Duplicate ";
+        return "Duplicate";
       }
       if (response.statusCode == 401) {
-        return "coachDuplicate ";
+        return "coachDuplicate";
       }
       final responseData = json.decode(response.body);
       if (response.statusCode != 200) {
@@ -108,12 +108,12 @@ class UserRepository {
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode != 200) {
-        throw Exception('Failed to get list users');
+        throw Exception('Failed to get user');
       }
       final responseData = json.decode(response.body);
       return UserModel.fromJson(responseData);
     } catch (e) {
-      throw Exception('خطا در دریافت لیست کاربران ');
+      throw Exception('خطا در دریافت اطلاعات کاربر ');
     }
   }
 

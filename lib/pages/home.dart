@@ -73,10 +73,18 @@ class _HomePageState extends State<HomePage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => UsersBloc()..add(UserGetEvant(userID)),
+          builder: (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => UsersBloc()..add(UserGetEvent(userID)),
+              ),
+              if(userRole ==2 && coachCode != 0) BlocProvider(
+                create: (context) => CategoryBloc()..add(LoadCategoryEvent(coachCode)),
+              ),
+            ],
             child: EditProfilePage(),
-          ),
+          )
+
         ),
       );
     } else if (value == 'manag_users') {

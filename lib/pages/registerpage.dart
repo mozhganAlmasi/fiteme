@@ -43,11 +43,12 @@ class _RegisterPageState extends State<RegisterPage> {
   bool dialogLoading = false;
   String? selectedGroup;
   int selectedIndex = 2;
-  String? selectedType;
+  String? selectedTypeName;
   int selectedTypeIndex = 0;
   List<bool> fieldErrors = [false, false, false, false, false, false];
 
   List<String?> lstGroupname = [];
+  List<int> lstGroupid =[];
 
   int coachCode = 0;
 
@@ -87,81 +88,83 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          height: size.height, // یا: MediaQuery.of(context).size.height
           width: double.infinity,
           color: mzhColorThem1[0], // رنگ پس‌زمینه کل صفحه
-          child: Column(
-            children: [
-              buildUIWithoutButton(),
-              BlocConsumer<UsersBloc, UsersState>(
-                builder: (context, state) {
-                  return buildUIButton();
-                },
-                listener: (context, state) {
-                  if (state is UserLoadingState) {
-                    dialogLoading = true;
-                  } else if (state is UserCreateSuccessState) {
-                    dialogLoading = false;
-                    // ذخیره در cubit
-                    context.read<UserinfoCubit>().login(
-                      state.userID,
-                      (selectedTypeIndex == 2) ? 1 : 2,
-                      coachCodeGenerate(selectedTypeIndex),
-                    );
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      // تابع async ناشناس برای استفاده از await
-                      () async {
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                buildUIWithoutButton(),
+                BlocConsumer<UsersBloc, UsersState>(
+                  builder: (context, state) {
+                    return buildUIButton();
+                  },
+                  listener: (context, state) {
+                    if (state is UserLoadingState) {
+                      dialogLoading = true;
+                    } else if (state is UserCreateSuccessState) {
+                      dialogLoading = false;
+                      // ذخیره در cubit
+                      context.read<UserinfoCubit>().login(
+                        state.userID,
+                        (selectedTypeIndex == 2) ? 1 : 2,
+                        coachCodeGenerate(selectedTypeIndex),
+                      );
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        // تابع async ناشناس برای استفاده از await
+                        () async {
+                          await customDialogBuilder(
+                            context ,
+                            "تبریک" ,
+                            "شما با موفقیت ثبت نام کردید" ,
+                          );
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => BlocProvider(
+                                create: (context) =>
+                                    SizesBloc()
+                                      ..add(SizesLoadEvent(state.userID)),
+                                child: HomePage(),
+                              ),
+                            ),
+                          );
+                        }(); // اجرای فوری تابع async
+                      });
+                    } else if (state is UserDuplicate) {
+                      dialogLoading = false;
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
                         await customDialogBuilder(
                           context ,
-                          "تبریک" ,
-                          "شما با موفقیت ثبت نام کردید" ,
+                          "توجه" ,
+                          "کاربری با این شماره قبلا ثبت نام کرده." ,
                         );
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => BlocProvider(
-                              create: (context) =>
-                                  SizesBloc()
-                                    ..add(SizesLoadEvent(state.userID)),
-                              child: HomePage(),
-                            ),
-                          ),
+                      });
+                    } else if (state is CoachDuplicate) {
+                      dialogLoading = false;
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        await customDialogBuilder(
+                          context ,
+                          "توجه" ,
+                          "کد مربی گری شما تکراری است " ,
                         );
-                      }(); // اجرای فوری تابع async
-                    });
-                  } else if (state is UserDuplicate) {
-                    dialogLoading = false;
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      await customDialogBuilder(
-                        context ,
-                        "توجه" ,
-                        "کاربری با این شماره قبلا ثبت نام کرده." ,
-                      );
-                    });
-                  } else if (state is CoachDuplicate) {
-                    dialogLoading = false;
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      await customDialogBuilder(
-                        context ,
-                        "توجه" ,
-                        "کد مربی گری شما تکراری است " ,
-                      );
-                    });
-                  } else if (state is UserErrorState) {
-                    dialogLoading = false;
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      await customDialogBuilder(
-                        context ,
-                        "خطا" ,
-                        "خطا در اتصال به سرور" ,
-                      );
-                    });
-                  }
+                      });
+                    } else if (state is UserErrorState) {
+                      dialogLoading = false;
+                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                        await customDialogBuilder(
+                          context ,
+                          "خطا" ,
+                          "خطا در اتصال به سرور" ,
+                        );
+                      });
+                    }
 
-                  // TODO: implement listener
-                },
-              ),
-              buildUIPrivacyPOlicy(),
-            ],
+                    // TODO: implement listener
+                  },
+                ),
+                buildUIPrivacyPOlicy(),
+              ],
+            ),
           ),
         ),
       ),
@@ -170,50 +173,110 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget buildUIWithoutButton() {
     return Center(
-      child: SingleChildScrollView(
-        // برای اسکرول در گوشی‌هایی با کیبورد
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Text("ثبت نام کاربر جدید", style: CustomTextStyle.textappbar),
-            SizedBox(height: 20),
-            Container(
-              width: 360, // عرض کادر فرم
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: mzhColorThem1[2], // رنگ کادر داخلی فرم
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // فیلد نام
-                    ShakeWidget(
-                      shake: fieldErrors[0],
-                      child: TextFormField(
-                        controller: _nameController,
-                        decoration: const InputDecoration(labelText: ' نام'),
-                      ),
+      child: Column(
+        children: [
+          Text("ثبت نام کاربر جدید", style: CustomTextStyle.textappbar),
+          SizedBox(height: 20),
+          Container(
+            width: 360, // عرض کادر فرم
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: mzhColorThem1[2], // رنگ کادر داخلی فرم
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // فیلد نام
+                  ShakeWidget(
+                    shake: fieldErrors[0],
+                    child: TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(labelText: ' نام'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'نام را وارد کنید';
+                        } else if (value.length < 3) {
+                          return 'نام باید حداقل سه حرف باشد';
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 20),
-                    //فیلد نام خوانوادگی
-                    ShakeWidget(
-                      shake: fieldErrors[1],
-                      child: TextFormField(
-                        controller: _famiyController,
-                        decoration: const InputDecoration(
-                          labelText: ' نام خانوادگی',
+                  ),
+                  const SizedBox(height: 20),
+                  //فیلد نام خوانوادگی
+                  ShakeWidget(
+                    shake: fieldErrors[1],
+                    child: TextFormField(
+                      controller: _famiyController,
+                      decoration: const InputDecoration(
+                        labelText: ' نام خانوادگی',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'نام خانوادگی را وارد کنید';
+                        } else if (value.length < 3) {
+                          return 'نام خانوادگی باید حداقل سه حرف باشد';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  //لیست نوع کاربری
+                  Row(
+                    children: [
+                      Text(
+                        'نوع کاربری :',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    //لیست نوع کاربری
+                      SizedBox(height: 20),
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          value: selectedTypeName,
+                          hint: Text(' عضو عمومی '),
+                          items: lstType.map((String type) {
+                            return DropdownMenuItem<String>(
+                              value: type,
+                              child: Text(type),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            changeUserType(newValue);
+                            _coachCodeController.text = generateRandomNumber().toString();
+                          },
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.purple.shade50,
+                            // بنفش کم‌رنگ
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          dropdownColor:
+                              Colors.purple.shade50, // پس‌زمینه لیست
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  //گروه کلاس : لیست باکس گروه که از دیتابیس در دیالوگ گرفته شده
+                  //اگر کاربر از نوع عضو گروه باشد نمایش داده می شود
+                  if (selectedTypeIndex == 1)
                     Row(
                       children: [
                         Text(
-                          'نوع کاربری :',
+                          'گروه کلاس:',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -222,17 +285,23 @@ class _RegisterPageState extends State<RegisterPage> {
                         SizedBox(height: 20),
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: selectedType,
-                            hint: Text(' عضو عمومی '),
-                            items: lstType.map((String type) {
-                              return DropdownMenuItem<String>(
-                                value: type,
-                                child: Text(type),
-                              );
-                            }).toList(),
+                            value: selectedGroup,
+                            hint: Text('انتخاب کنید'),
+                            items: lstGroupname
+                                .where((group) => group != null)
+                                .map((group) {
+                                  return DropdownMenuItem<String>(
+                                    value: group,
+                                    child: Text(group!),
+                                  );
+                                })
+                                .toList(),
                             onChanged: (String? newValue) {
-                              changeUserType(newValue);
-                              _coachCodeController.text = generateRandomNumber().toString();
+                              setState(() {
+                                selectedGroup = newValue;
+                                selectedIndex =
+                                    lstGroupname.indexOf(newValue!) ;
+                              });
                             },
                             decoration: InputDecoration(
                               filled: true,
@@ -253,151 +322,99 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    //گروه کلاس : لیست باکس گروه که از دیتابیس در دیالوگ گرفته شده
-                    //اگر کاربر از نوع عضو گروه باشد نمایش داده می شود
-                    if (selectedTypeIndex == 1)
-                      Row(
-                        children: [
-                          Text(
-                            'گروه کلاس:',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              value: selectedGroup,
-                              hint: Text('انتخاب کنید'),
-                              items: lstGroupname
-                                  .where((group) => group != null)
-                                  .map((group) {
-                                    return DropdownMenuItem<String>(
-                                      value: group,
-                                      child: Text(group!),
-                                    );
-                                  })
-                                  .toList(),
-                              onChanged: (String? newValue) {
-                                setState(() {
-                                  selectedGroup = newValue;
-                                  selectedIndex =
-                                      lstGroupname.indexOf(newValue!) + 1;
-                                });
-                              },
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: Colors.purple.shade50,
-                                // بنفش کم‌رنگ
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                              dropdownColor:
-                                  Colors.purple.shade50, // پس‌زمینه لیست
-                            ),
-                          ),
-                        ],
+                  SizedBox(height: 20),
+                  // شماره موبایل
+                  ShakeWidget(
+                    shake: fieldErrors[2],
+                    child: TextFormField(
+                      controller: _phonenumberController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'شماره موبایل',
+                        border: OutlineInputBorder(),
                       ),
-                    SizedBox(height: 20),
-                    // شماره موبایل
-                    ShakeWidget(
-                      shake: fieldErrors[2],
-                      child: TextFormField(
-                        controller: _phonenumberController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          labelText: 'شماره موبایل',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'شماره موبایل را وارد کنید';
-                          } else if (!RegExp(r'^0\d{10}$').hasMatch(value)) {
-                            return 'شماره موبایل باید با ۰ شروع شود و ۱۱ رقم باشد';
-                          }
-                          return null;
-                        },
-                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'شماره موبایل را وارد کنید';
+                        } else if (!RegExp(r'^0\d{10}$').hasMatch(value)) {
+                          return 'شماره موبایل باید با ۰ شروع شود و ۱۱ رقم باشد';
+                        }
+                        return null;
+                      },
                     ),
-                    SizedBox(height: 20),
-                    // شماره موبایل
-                    if (selectedTypeIndex == 2)
-                      ShakeWidget(
-                        shake: fieldErrors[2],
-                        child: TextFormField(
-                          controller: _coachCodeController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: 'کد چهار رقمی اختصاصی مربی',
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'کد چهار رقمی به دلخواه وارد کنید';
-                            } else if (!RegExp(r'^\d{4}$').hasMatch(value)) {
-                              return 'یک عدد چهار رقمی وارد کنید .';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    const SizedBox(height: 20),
-                    // رمز عبور
+                  ),
+                  SizedBox(height: 20),
+                  // کد مربی
+                  if (selectedTypeIndex == 2)
                     ShakeWidget(
                       shake: fieldErrors[3],
                       child: TextFormField(
-                        controller: _passwordController,
-                        obscureText: !_obscureText,
+                        controller: _coachCodeController,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          labelText: 'رمز عبور',
+                          labelText: 'کد چهار رقمی اختصاصی مربی',
                           border: OutlineInputBorder(),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'رمز عبور را وارد کنید';
-                          } else if (value.length < 5) {
-                            return 'رمز عبور باید حداقل ۵ کاراکتر باشد';
+                            return 'کد چهار رقمی به دلخواه وارد کنید';
+                          } else if (!RegExp(r'^\d{4}$').hasMatch(value)) {
+                            return 'یک عدد چهار رقمی وارد کنید .';
                           }
                           return null;
                         },
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    // تکرار رمز عبور
-                    ShakeWidget(
-                      shake: fieldErrors[4],
-                      child: TextFormField(
-                        controller: _repasswordController,
-                        obscureText: !_obscureText,
-                        decoration: InputDecoration(
-                          labelText: ' تکرار رمز عبور',
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'رمز عبور را وارد کنید';
-                          } else if (value.length < 5) {
-                            return 'رمز عبور باید حداقل ۵ کاراکتر باشد';
-                          }
-                          return null;
-                        },
+                  const SizedBox(height: 20),
+                  // رمز عبور
+                  ShakeWidget(
+                    shake: fieldErrors[4],
+                    child: TextFormField(
+                      controller: _passwordController,
+                      obscureText: !_obscureText,
+                      decoration: InputDecoration(
+                        labelText: 'رمز عبور',
+                        border: OutlineInputBorder(),
                       ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'رمز عبور را وارد کنید';
+                        } else if (value.length < 5) {
+                          return 'رمز عبور باید حداقل ۵ کاراکتر باشد';
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 20),
+                  // تکرار رمز عبور
+                  ShakeWidget(
+                    shake: fieldErrors[5],
+                    child: TextFormField(
+                      controller: _repasswordController,
+                      obscureText: !_obscureText,
+                      decoration: InputDecoration(
+                        labelText: ' تکرار رمز عبور',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'رمز عبور را وارد کنید';
+                        } else if (value.length < 5) {
+                          return 'رمز عبور باید حداقل ۵ کاراکتر باشد';
+                        } else if (value != _passwordController.text) {
+                          return 'رمز عبور و تکرار آن یکسان نیستند';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -423,6 +440,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   _nameController.text.isEmpty,
                   _famiyController.text.isEmpty,
                   _phonenumberController.text.isEmpty,
+                  (selectedTypeIndex ==2)?_coachCodeController.text.isEmpty:true,
                   _passwordController.text.isEmpty,
                   _repasswordController.text.isEmpty,
                 ];
@@ -430,6 +448,7 @@ class _RegisterPageState extends State<RegisterPage> {
               if (!_isPolicyAccepted) {
                 _isPolicyAccepted = await showPrivacyPolicyDialog(context);
               } else if (isValid) {
+
                 UserModel user = UserModel(
                   name: _nameController.text,
                   family: _famiyController.text,
@@ -513,7 +532,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void changeUserType(newValue) async {
-    selectedType = newValue;
+    selectedTypeName = newValue;
     selectedTypeIndex = lstType.indexOf(newValue!);
     if (selectedTypeIndex == 1) {
       final result = await showDialog(
@@ -530,6 +549,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (result != null) {
         List<CategoryModel> tempList = result[0];
         lstGroupname = tempList.map((item) => item.categoryName).toList();
+        lstGroupid = tempList.map((item)=>item.id).toList();
         coachCode = int.parse(result[1]);
       } else {
         lstGroupname = [];
@@ -602,8 +622,11 @@ class _RegisterPageState extends State<RegisterPage> {
     if (selectedTypeIndex == 2) {
       return 0;
     } else if (selectedTypeIndex == 1) {
-      return selectedIndex;
+
+      return lstGroupid[selectedIndex ];
     }
     return 0;
   }
+
+
 }
