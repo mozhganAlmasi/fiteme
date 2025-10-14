@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../../../../../models/size_model.dart';
+import '../../model/size_model.dart';
 
-abstract class SizeApiService{
+class SizeApiService{
 
   Future<http.Response> getUserSize(String baseUrl, String userID) async {
     final url = Uri.parse('$baseUrl/usersize');

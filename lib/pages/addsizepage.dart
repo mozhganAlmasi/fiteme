@@ -1,26 +1,27 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shahrzad/blocs/size/sizes_bloc.dart';
-import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
-import 'package:shahrzad/widgets/shake_animation.dart';
+import 'package:shahrzad/core/widgets/shake_animation.dart';
 import 'package:shahrzad/classes/style.dart';
-import 'package:shahrzad/widgets/privacypolicydialog.dart';
-import 'package:shahrzad/widgets/customalertdialog.dart';
+import 'package:shahrzad/core/widgets/customalertdialog.dart';
+import 'package:shahrzad/feature/feature_size/data/datasource/remote/size_api_service.dart';
+import 'package:shahrzad/feature/feature_size/data/repository/repository.dart';
+import 'package:shahrzad/feature/feature_size/domain/usecase/create_size_usecase.dart';
+import 'package:shahrzad/feature/feature_size/domain/usecase/get_size_usecase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../models/size_model.dart';
-import '../models/user_model.dart';
-import '../widgets/contentprivacypolicywidget.dart';
-import '../widgets/persiandatepicker.dart';
+import '../core/widgets/contentprivacypolicywidget.dart';
+import '../core/widgets/persiandatepicker.dart';
+import '../feature/feature_size/data/model/size_model.dart';
+import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
+import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
 import 'home.dart';
 
 class AddsizePage extends StatefulWidget {
   final String userID;
   final GlobalKey<PersianDatePickerState> datePickerKey = GlobalKey();
 
-  AddsizePage({super.key , required this.userID});
+  AddsizePage({super.key, required this.userID});
 
   @override
   State<AddsizePage> createState() => _AddsizePageState();
@@ -38,15 +39,11 @@ class _AddsizePageState extends State<AddsizePage> {
   bool _obscureText = false;
   bool _isPolicyAccepted = false;
   String? selectedGroup;
-  int selectedIndex =1;
+  int selectedIndex = 1;
   String selectedMonth = '';
   int selectedYear = 0;
 
-  final List<String> lstGroupname = [
-    'ایروبیک',
-    'ایروبیک فانکشنال',
-    'CX',
-  ];
+  final List<String> lstGroupname = ['ایروبیک', 'ایروبیک فانکشنال', 'CX'];
 
   @override
   void initState() {
@@ -72,7 +69,9 @@ class _AddsizePageState extends State<AddsizePage> {
     shoulderController.dispose();
     bellyController.dispose();
   }
+
   List<bool> fieldErrors = [false, false, false, false, false, false, false];
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -85,24 +84,24 @@ class _AddsizePageState extends State<AddsizePage> {
           color: mzhColorThem1[0], // رنگ پس‌زمینه کل صفحه
           child: BlocListener<SizesBloc, SizesState>(
             listener: (context, state) {
-              if(state is SizeCreateSuccess)
-                {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    () async{
-                     await customDialogBuilder(context, "تبریک", "سایز شما با موفقیت ثبت شد");
-                     waistController.clear();
-                     chestController.clear();
-                     hipsController.clear();
-                     armController.clear();
-                     thighController.clear();
-                     shoulderController.clear();
-                     bellyController.clear();
-
-                    }();
-
-                  });
-
-                }
+              if (state is SizeCreateSuccess) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  () async {
+                    await customDialogBuilder(
+                      context,
+                      "تبریک",
+                      "سایز شما با موفقیت ثبت شد",
+                    );
+                    waistController.clear();
+                    chestController.clear();
+                    hipsController.clear();
+                    armController.clear();
+                    thighController.clear();
+                    shoulderController.clear();
+                    bellyController.clear();
+                  }();
+                });
+              }
               // TODO: implement listener
             },
             child: BlocBuilder<SizesBloc, SizesState>(
@@ -117,9 +116,7 @@ class _AddsizePageState extends State<AddsizePage> {
                           "افزودن سایز جدید",
                           style: CustomTextStyle.textappbar,
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
+                        SizedBox(height: 20),
                         Container(
                           width: 360, // عرض کادر فرم
                           padding: const EdgeInsets.all(20),
@@ -137,10 +134,14 @@ class _AddsizePageState extends State<AddsizePage> {
                                   child: TextFormField(
                                     controller: waistController,
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'دور کمر '),
+                                    decoration: const InputDecoration(
+                                      labelText: 'دور کمر ',
+                                    ),
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) return 'لطفاً دور کمر را وارد کنید';
-                                      if (double.tryParse(value) == null) return 'فقط عدد وارد کنید';
+                                      if (value == null || value.isEmpty)
+                                        return 'لطفاً دور کمر را وارد کنید';
+                                      if (double.tryParse(value) == null)
+                                        return 'فقط عدد وارد کنید';
                                       return null;
                                     },
                                   ),
@@ -150,10 +151,14 @@ class _AddsizePageState extends State<AddsizePage> {
                                   child: TextFormField(
                                     controller: chestController,
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'دور سینه '),
+                                    decoration: const InputDecoration(
+                                      labelText: 'دور سینه ',
+                                    ),
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) return 'لطفاً دور سینه را وارد کنید';
-                                      if (double.tryParse(value) == null) return 'فقط عدد وارد کنید';
+                                      if (value == null || value.isEmpty)
+                                        return 'لطفاً دور سینه را وارد کنید';
+                                      if (double.tryParse(value) == null)
+                                        return 'فقط عدد وارد کنید';
                                       return null;
                                     },
                                   ),
@@ -163,10 +168,14 @@ class _AddsizePageState extends State<AddsizePage> {
                                   child: TextFormField(
                                     controller: hipsController,
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'دور باسن '),
+                                    decoration: const InputDecoration(
+                                      labelText: 'دور باسن ',
+                                    ),
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) return 'لطفاً دور باسن را وارد کنید';
-                                      if (double.tryParse(value) == null) return 'فقط عدد وارد کنید';
+                                      if (value == null || value.isEmpty)
+                                        return 'لطفاً دور باسن را وارد کنید';
+                                      if (double.tryParse(value) == null)
+                                        return 'فقط عدد وارد کنید';
                                       return null;
                                     },
                                   ),
@@ -176,10 +185,14 @@ class _AddsizePageState extends State<AddsizePage> {
                                   child: TextFormField(
                                     controller: armController,
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'دور بازو '),
+                                    decoration: const InputDecoration(
+                                      labelText: 'دور بازو ',
+                                    ),
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) return 'لطفاً دور بازو را وارد کنید';
-                                      if (double.tryParse(value) == null) return 'فقط عدد وارد کنید';
+                                      if (value == null || value.isEmpty)
+                                        return 'لطفاً دور بازو را وارد کنید';
+                                      if (double.tryParse(value) == null)
+                                        return 'فقط عدد وارد کنید';
                                       return null;
                                     },
                                   ),
@@ -189,10 +202,14 @@ class _AddsizePageState extends State<AddsizePage> {
                                   child: TextFormField(
                                     controller: thighController,
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'دور ران '),
+                                    decoration: const InputDecoration(
+                                      labelText: 'دور ران ',
+                                    ),
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) return 'لطفاً دور ران را وارد کنید';
-                                      if (double.tryParse(value) == null) return 'فقط عدد وارد کنید';
+                                      if (value == null || value.isEmpty)
+                                        return 'لطفاً دور ران را وارد کنید';
+                                      if (double.tryParse(value) == null)
+                                        return 'فقط عدد وارد کنید';
                                       return null;
                                     },
                                   ),
@@ -202,10 +219,14 @@ class _AddsizePageState extends State<AddsizePage> {
                                   child: TextFormField(
                                     controller: shoulderController,
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'عرض شانه '),
+                                    decoration: const InputDecoration(
+                                      labelText: 'عرض شانه ',
+                                    ),
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) return 'لطفاً عرض شانه را وارد کنید';
-                                      if (double.tryParse(value) == null) return 'فقط عدد وارد کنید';
+                                      if (value == null || value.isEmpty)
+                                        return 'لطفاً عرض شانه را وارد کنید';
+                                      if (double.tryParse(value) == null)
+                                        return 'فقط عدد وارد کنید';
                                       return null;
                                     },
                                   ),
@@ -215,17 +236,19 @@ class _AddsizePageState extends State<AddsizePage> {
                                   child: TextFormField(
                                     controller: bellyController,
                                     keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(labelText: 'دور شکم '),
+                                    decoration: const InputDecoration(
+                                      labelText: 'دور شکم ',
+                                    ),
                                     validator: (value) {
-                                      if (value == null || value.isEmpty) return 'لطفاً دور شکم را وارد کنید';
-                                      if (double.tryParse(value) == null) return 'فقط عدد وارد کنید';
+                                      if (value == null || value.isEmpty)
+                                        return 'لطفاً دور شکم را وارد کنید';
+                                      if (double.tryParse(value) == null)
+                                        return 'فقط عدد وارد کنید';
                                       return null;
                                     },
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 20,
-                                ),
+                                SizedBox(height: 20),
                                 PersianDatePicker(
                                   key: widget.datePickerKey,
                                   onDateChanged: (month, year) {
@@ -236,82 +259,163 @@ class _AddsizePageState extends State<AddsizePage> {
                                     });
                                   },
                                 ),
-                                SizedBox(
-                                  height: 20,
-                                ),
+                                SizedBox(height: 20),
                                 Container(
                                   width: double.infinity,
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       ElevatedButton(
                                         style: OutlinedButton.styleFrom(
                                           padding: EdgeInsets.symmetric(
-                                              horizontal: size.width/10, vertical: 18),
+                                            horizontal: size.width / 10,
+                                            vertical: 18,
+                                          ),
                                           backgroundColor: mzhColorThem1[5],
                                           foregroundColor: mzhColorThem1[2],
-                                          side: BorderSide(color: mzhColorThem1[2]),
+                                          side: BorderSide(
+                                            color: mzhColorThem1[2],
+                                          ),
                                         ),
                                         onPressed: () async {
-                                          bool isValid = _formKey.currentState!.validate();
+                                          bool isValid = _formKey.currentState!
+                                              .validate();
                                           setState(() {
                                             fieldErrors = [
-                                              waistController.text.isEmpty || double.tryParse(waistController.text) == null,
-                                              chestController.text.isEmpty || double.tryParse(chestController.text) == null,
-                                              hipsController.text.isEmpty || double.tryParse(hipsController.text) == null,
-                                              armController.text.isEmpty || double.tryParse(armController.text) == null,
-                                              thighController.text.isEmpty || double.tryParse(thighController.text) == null,
-                                              shoulderController.text.isEmpty || double.tryParse(shoulderController.text) == null,
-                                              bellyController.text.isEmpty || double.tryParse(bellyController.text) == null,
+                                              waistController.text.isEmpty ||
+                                                  double.tryParse(
+                                                        waistController.text,
+                                                      ) ==
+                                                      null,
+                                              chestController.text.isEmpty ||
+                                                  double.tryParse(
+                                                        chestController.text,
+                                                      ) ==
+                                                      null,
+                                              hipsController.text.isEmpty ||
+                                                  double.tryParse(
+                                                        hipsController.text,
+                                                      ) ==
+                                                      null,
+                                              armController.text.isEmpty ||
+                                                  double.tryParse(
+                                                        armController.text,
+                                                      ) ==
+                                                      null,
+                                              thighController.text.isEmpty ||
+                                                  double.tryParse(
+                                                        thighController.text,
+                                                      ) ==
+                                                      null,
+                                              shoulderController.text.isEmpty ||
+                                                  double.tryParse(
+                                                        shoulderController.text,
+                                                      ) ==
+                                                      null,
+                                              bellyController.text.isEmpty ||
+                                                  double.tryParse(
+                                                        bellyController.text,
+                                                      ) ==
+                                                      null,
                                             ];
                                           });
-                                          if (isValid){
+                                          if (isValid) {
                                             SizeModel size = SizeModel(
-                                              id: 0, // در سرور به‌صورت UUID ساخته میشه، پس اینجا خالی بذار
-                                              waist: double.parse(waistController.text),
-                                              chest: double.parse(chestController.text),
-                                              hips: double.parse(hipsController.text),
-                                              arm: double.parse(armController.text),
-                                              thigh: double.parse(thighController.text),
-                                              shoulder: double.parse(shoulderController.text),
-                                              belly: double.parse(bellyController.text),
-                                              dateInsert: selectedYear.toString()+"/" +selectedMonth,
-                                              userId: widget.userID, // مقدار مورد نظر شما
+                                              id: 0,
+                                              // در سرور به‌صورت UUID ساخته میشه، پس اینجا خالی بذار
+                                              waist: double.parse(
+                                                waistController.text,
+                                              ),
+                                              chest: double.parse(
+                                                chestController.text,
+                                              ),
+                                              hips: double.parse(
+                                                hipsController.text,
+                                              ),
+                                              arm: double.parse(
+                                                armController.text,
+                                              ),
+                                              thigh: double.parse(
+                                                thighController.text,
+                                              ),
+                                              shoulder: double.parse(
+                                                shoulderController.text,
+                                              ),
+                                              belly: double.parse(
+                                                bellyController.text,
+                                              ),
+                                              dateInsert:
+                                                  selectedYear.toString() +
+                                                  "/" +
+                                                  selectedMonth,
+                                              userId: widget
+                                                  .userID, // مقدار مورد نظر شما
                                             );
-                                            context
-                                                .read<SizesBloc>()
-                                                .add(SizeCreateEvent(size));
+                                            context.read<SizesBloc>().add(
+                                              CreateSize(size),
+                                            );
                                           }
-
                                         },
-                                        child: Text("ذخیره",
-                                            style: CustomTextStyle.textbutton),
+                                        child: Text(
+                                          "ذخیره",
+                                          style: CustomTextStyle.textbutton,
+                                        ),
                                       ),
                                       ElevatedButton(
                                         style: OutlinedButton.styleFrom(
                                           padding: EdgeInsets.symmetric(
-                                              horizontal: size.width/10, vertical: 18),
+                                            horizontal: size.width / 10,
+                                            vertical: 18,
+                                          ),
                                           backgroundColor: mzhColorThem1[5],
                                           foregroundColor: mzhColorThem1[2],
-                                          side: BorderSide(color: mzhColorThem1[2]),
+                                          side: BorderSide(
+                                            color: mzhColorThem1[2],
+                                          ),
                                         ),
-                                        onPressed: (){
+                                        onPressed: () {
                                           Navigator.pushReplacement(
-                                              context,  MaterialPageRoute(
+                                            context,
+                                            MaterialPageRoute(
                                               builder: (_) => BlocProvider(
-                                                create: (context) => SizesBloc()..add(SizesLoadEvent( widget.userID)),
+                                                create: (context) => SizesBloc(
+                                                  getSizeUseCase: GetSizeUseCase(
+                                                    sizeRepository:
+                                                        SizeRepositoryImpementation(
+                                                          apiService:
+                                                              SizeApiService(),
+                                                        ),
+                                                  ),
+                                                  createSizeUseCase: CreateSizeUseCase(
+                                                    sizeRepository:
+                                                        SizeRepositoryImpementation(
+                                                          apiService:
+                                                              SizeApiService(),
+                                                        ),
+                                                  ),
+                                                  deletSizeUseCase: DeletSizeUseCase(
+                                                    sizeRepository:
+                                                        SizeRepositoryImpementation(
+                                                          apiService:
+                                                              SizeApiService(),
+                                                        ),
+                                                  ),
+                                                )..add(LoadSizes(widget.userID)),
                                                 child: HomePage(),
-                                              )));
-
-                                        }, child:  Text("بازگشت",
-                                          style: CustomTextStyle.textbutton),)
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          "بازگشت",
+                                          style: CustomTextStyle.textbutton,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-
+                                SizedBox(height: 20),
                               ],
                             ),
                           ),

@@ -3,10 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shahrzad/blocs/category/category_bloc.dart';
-import 'package:shahrzad/blocs/size/sizes_bloc.dart';
-import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
+import 'package:shahrzad/feature/feature_size/domain/entities/entities.dart';
 import 'package:shahrzad/pages/addsizepage.dart';
 import 'package:shahrzad/pages/adminpage.dart';
 import 'package:shahrzad/pages/editprofilepage.dart';
@@ -15,8 +14,23 @@ import 'package:shahrzad/pages/manageCategory.dart';
 import 'package:shahrzad/pages/showchartpage.dart';
 import '../classes/appexisthandler.dart';
 import '../cubit/userinfo_cubit.dart';
-import '../models/size_model.dart';
-import '../widgets/customalertdialog.dart';
+import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
+import '../feature/feature_size/data/model/size_model.dart';
+import '../feature/feature_size/data/repository/repository.dart';
+import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
+import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
+import '../feature/feature_user/data/datasource/remote/user_api_service.dart';
+import '../feature/feature_user/data/repository/repository.dart';
+import '../feature/feature_user/domain/usecase/usercreate_usecase.dart';
+import '../feature/feature_user/domain/usecase/userdelet_usecase.dart';
+import '../feature/feature_user/domain/usecase/userget_usecase.dart';
+import '../feature/feature_user/domain/usecase/userlogin_usecase.dart';
+import '../feature/feature_user/domain/usecase/usersgetall_usecaase.dart';
+import '../feature/feature_user/domain/usecase/userupdate_usecase.dart';
+import '../feature/feature_user/presentation/bloc/user/users_bloc.dart';
+import '../core/widgets/customalertdialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -64,7 +78,7 @@ class _HomePageState extends State<HomePage> {
 
     if (confirm == true) {
       // فقط در صورتی حذف کن که کاربر تأیید کرده باشه
-      context.read<SizesBloc>().add(SizeDeletEvent(userID, rowID));
+      context.read<SizesBloc>().add(DeleteSize(userID, rowID));
     }
   }
 
@@ -76,7 +90,14 @@ class _HomePageState extends State<HomePage> {
           builder: (context) => MultiBlocProvider(
             providers: [
               BlocProvider(
-                create: (context) => UsersBloc()..add(UserGetEvent(userID)),
+                create: (context) => UsersBloc(
+                  getUsersUseCase:UsersGetAllUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)) ,
+                  getUserUseCase: UserGetUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                  userCreateUseCase: UserCreateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                  userDeletUseCase: UserDeletUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                  userLoginUseCase: UserLoginUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                  userUpdateUseCase: UserUpdateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                )..add(UserGetEvent(userID)),
               ),
               if(userRole ==2 && coachCode != 0) BlocProvider(
                 create: (context) => CategoryBloc()..add(LoadCategoryEvent(coachCode)),
@@ -92,7 +113,14 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (context) => UsersBloc()..add(UsersLoadEvent(coachCode)),
+            create: (context) => UsersBloc(
+              getUsersUseCase:UsersGetAllUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)) ,
+              getUserUseCase: UserGetUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+              userCreateUseCase: UserCreateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+              userDeletUseCase: UserDeletUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+              userLoginUseCase: UserLoginUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+              userUpdateUseCase: UserUpdateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+            )..add(UsersAllGetEvent(coachCode)),
             child: AdminPage(),
           ),
         ),
@@ -369,7 +397,29 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => SizesBloc(),
+                create: (context) => SizesBloc(
+                  getSizeUseCase: GetSizeUseCase(
+                    sizeRepository:
+                    SizeRepositoryImpementation(
+                      apiService:
+                      SizeApiService(),
+                    ),
+                  ),
+                  createSizeUseCase: CreateSizeUseCase(
+                    sizeRepository:
+                    SizeRepositoryImpementation(
+                      apiService:
+                      SizeApiService(),
+                    ),
+                  ),
+                  deletSizeUseCase: DeletSizeUseCase(
+                    sizeRepository:
+                    SizeRepositoryImpementation(
+                      apiService:
+                      SizeApiService(),
+                    ),
+                  ),
+                ),
                 child: AddsizePage(userID: userID),
               ),
             ),

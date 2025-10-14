@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shahrzad/widgets/privacypolicytext.dart';
+import 'package:shahrzad/core/widgets/contentprivacypolicywidget.dart';
 
 void showPrivacyPolicyDialog(BuildContext context) {
   bool isPolicyAccepted = false; // مقدار محلی برای چک‌باکس

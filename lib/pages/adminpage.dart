@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/style.dart';
-import 'package:shahrzad/models/user_model.dart';
 import '../classes/color.dart';
-import '../widgets/customalertdialog.dart';
-import '../widgets/userstatusselector.dart';
+import '../core/widgets/customalertdialog.dart';
+import '../core/widgets/userstatusselector.dart';
+import '../feature/feature_user/data/model/usermodel.dart';
+import '../feature/feature_user/presentation/bloc/user/users_bloc.dart';
 
 class AdminPage extends StatefulWidget {
   const AdminPage({super.key});

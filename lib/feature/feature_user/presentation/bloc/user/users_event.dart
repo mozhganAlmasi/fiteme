@@ -4,9 +4,9 @@ part of 'users_bloc.dart';
 @immutable
 sealed class UsersEvent {}
 
-class UsersLoadEvent extends UsersEvent {
+class UsersAllGetEvent extends UsersEvent {
   final int coachCode;
-  UsersLoadEvent(this.coachCode);
+  UsersAllGetEvent(this.coachCode);
 }
 class UserGetEvent extends UsersEvent {
   final String userID;
@@ -31,8 +31,8 @@ class DeleteUserEvent extends UsersEvent {
   DeleteUserEvent(this.phoneNumber);
 }
 
-class LoginSubmittedEvent extends UsersEvent {
+class LoginUserEvent extends UsersEvent {
   final String phoneNumber;
   final String password;
-  LoginSubmittedEvent({required this.phoneNumber, required this.password});
+  LoginUserEvent({required this.phoneNumber, required this.password});
 }

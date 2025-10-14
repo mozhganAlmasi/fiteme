@@ -5,19 +5,32 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shahrzad/blocs/category/category_bloc.dart';
-import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
 import 'package:shahrzad/pages/loginpage.dart';
-import 'package:shahrzad/widgets/customalertdialog.dart';
+import 'package:shahrzad/core/widgets/customalertdialog.dart';
 import 'package:shahrzad/pages/coachcode_dialogpage.dart';
-import 'package:shahrzad/widgets/shake_animation.dart';
+import 'package:shahrzad/core/widgets/shake_animation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../blocs/size/sizes_bloc.dart';
 import '../cubit/userinfo_cubit.dart';
+import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
+import '../feature/feature_size/data/repository/repository.dart';
+import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
+import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
+import '../feature/feature_user/data/datasource/remote/user_api_service.dart';
+import '../feature/feature_user/data/model/usermodel.dart';
+import '../feature/feature_user/data/repository/repository.dart';
+import '../feature/feature_user/domain/usecase/usercreate_usecase.dart';
+import '../feature/feature_user/domain/usecase/userdelet_usecase.dart';
+import '../feature/feature_user/domain/usecase/userget_usecase.dart';
+import '../feature/feature_user/domain/usecase/userlogin_usecase.dart';
+import '../feature/feature_user/domain/usecase/usersgetall_usecaase.dart';
+import '../feature/feature_user/domain/usecase/userupdate_usecase.dart';
+import '../feature/feature_user/presentation/bloc/user/users_bloc.dart';
 import '../models/category_model.dart';
-import '../models/user_model.dart';
-import '../widgets/contentprivacypolicywidget.dart';
+import '../core/widgets/contentprivacypolicywidget.dart';
 import 'home.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -122,8 +135,30 @@ class _RegisterPageState extends State<RegisterPage> {
                             MaterialPageRoute(
                               builder: (_) => BlocProvider(
                                 create: (context) =>
-                                    SizesBloc()
-                                      ..add(SizesLoadEvent(state.userID)),
+                                SizesBloc(
+                                  getSizeUseCase: GetSizeUseCase(
+                                    sizeRepository:
+                                    SizeRepositoryImpementation(
+                                      apiService:
+                                      SizeApiService(),
+                                    ),
+                                  ),
+                                  createSizeUseCase: CreateSizeUseCase(
+                                    sizeRepository:
+                                    SizeRepositoryImpementation(
+                                      apiService:
+                                      SizeApiService(),
+                                    ),
+                                  ),
+                                  deletSizeUseCase: DeletSizeUseCase(
+                                    sizeRepository:
+                                    SizeRepositoryImpementation(
+                                      apiService:
+                                      SizeApiService(),
+                                    ),
+                                  ),
+                                )
+                                      ..add(LoadSizes(state.userID)),
                                 child: HomePage(),
                               ),
                             ),
@@ -459,6 +494,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   password: _passwordController.text,
                   active: true,
                   coach_code: coachCodeGenerate(selectedTypeIndex),
+                  id: null,
                 );
                 context.read<UsersBloc>().add(UserCreateEvent(user));
               }
@@ -486,7 +522,14 @@ class _RegisterPageState extends State<RegisterPage> {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
                   builder: (_) => BlocProvider(
-                    create: (context) => UsersBloc(),
+                    create: (context) => UsersBloc(
+                      getUsersUseCase:UsersGetAllUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)) ,
+                      getUserUseCase: UserGetUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                      userCreateUseCase: UserCreateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                      userDeletUseCase: UserDeletUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                      userLoginUseCase: UserLoginUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                      userUpdateUseCase: UserUpdateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                    ),
                     child: LoginPage(),
                   ),
                 ),

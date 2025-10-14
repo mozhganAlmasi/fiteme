@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../classes/style.dart';
+import '../../classes/style.dart';
+
 
 Future<void> customDialogBuilder(BuildContext context , String getTitle ,String getContent ) {
    String title = getTitle;

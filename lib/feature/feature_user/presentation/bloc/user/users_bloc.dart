@@ -1,22 +1,42 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:shahrzad/feature/feature_user/data/model/usermodel.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/loginparams.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/userdelet_usecase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/userget_usecase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/usercreate_usecase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/userlogin_usecase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/userupdate_usecase.dart';
 
-import '../../models/user_model.dart';
-import '../../repositories/user_repository.dart';
+import '../../../domain/usecase/usersgetall_usecaase.dart';
 
 part 'users_event.dart';
 
 part 'users_state.dart';
 
 class UsersBloc extends Bloc<UsersEvent, UsersState> {
-  UsersBloc() : super(UsersInitialState()) {
+  final UsersGetAllUseCase getUsersUseCase;
+  final UserGetUseCase getUserUseCase;
+  final UserCreateUseCase userCreateUseCase;
+  final UserDeletUseCase userDeletUseCase;
+  final UserLoginUseCase userLoginUseCase;
+  final UserUpdateUseCase userUpdateUseCase;
+
+  UsersBloc({
+    required this.userDeletUseCase,
+    required this.userLoginUseCase,
+    required this.userUpdateUseCase,
+    required this.getUsersUseCase,
+    required this.getUserUseCase,
+    required this.userCreateUseCase,
+  }) : super(UsersInitialState()) {
     on<UsersEvent>((event, emit) {
       // TODO: implement event handler
     });
-    on<UsersLoadEvent>((event, emit) async {
+    on<UsersAllGetEvent>((event, emit) async {
       emit(UserLoadingState());
       try {
-        final users = await UserRepository.getAllUsers(event.coachCode);
+        final users = await getUsersUseCase(params: event.coachCode);
         emit(UserLoadedState(users));
       } catch (e) {
         emit(UserErrorState(e.toString()));
@@ -26,7 +46,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     on<UserGetEvent>((event, emit) async {
       emit(UserLoadingState());
       try {
-        final users = await UserRepository.getUser(event.userID);
+        final users = await getUserUseCase(params: event.userID);
         emit(UserGetSuccessState(users));
       } catch (e) {
         emit(UserErrorState(e.toString()));
@@ -36,7 +56,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
     on<UserCreateEvent>((event, emit) async {
       try {
         emit(UserLoadingState());
-        final duplicate = await UserRepository.createUser(event.user);
+        final duplicate = await userCreateUseCase(params: event.user);
         if (duplicate == "Duplicate")
           emit(UserDuplicate());
         else if (duplicate == "coachDuplicate")
@@ -50,7 +70,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
     on<UserUpdateEvent>((event, emit) async {
       try {
-        await UserRepository.updateUser(event.updatedUser);
+        await userUpdateUseCase(params: event.updatedUser);
         emit(UpdateUserSuccessState());
       } catch (e) {
         emit(UserErrorState(e.toString()));
@@ -59,20 +79,18 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
 
     on<DeleteUserEvent>((event, emit) async {
       try {
-        await UserRepository.deleteUser(event.phoneNumber);
+        await userDeletUseCase(params: event.phoneNumber);
         emit(UserDeletSuccessState());
       } catch (e) {
         emit(UserDeletFailState(e.toString()));
       }
     });
 
-    on<LoginSubmittedEvent>((event, emit) async {
+    on<LoginUserEvent>((event, emit) async {
       try {
         emit(UserLoadingState());
-        var result = await UserRepository.login(
-          event.phoneNumber,
-          event.password,
-        );
+        final params=LoginUserParams(phonenumber:  event.phoneNumber,password:  event.password);
+        var result = await userLoginUseCase(params: params);
         if (result["success"] == true) {
           emit(UserLoginSuccessState(UserModel.fromJson(result["user"])));
         } else {
@@ -90,7 +108,7 @@ class UsersBloc extends Bloc<UsersEvent, UsersState> {
   ) async {
     emit(UserLoadingState());
     try {
-      final users = await UserRepository.getUser(event.userID);
+      final users = await getUserUseCase(params: event.userID);
       emit(UserGetSuccessState(users));
     } catch (e) {
       emit(UserErrorState(e.toString()));

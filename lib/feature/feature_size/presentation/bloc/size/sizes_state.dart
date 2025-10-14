@@ -20,7 +20,7 @@ class SizeDeleteFail extends SizesState{
   SizeDeleteFail(this.msg);
 }
 class SizeLoadSuccess extends SizesState {
-  List<SizeEntities> lstSize ;
+  List<SizeModel> lstSize ;
   SizeLoadSuccess(this.lstSize);
 }
 class SizeLoadFail extends SizesState {

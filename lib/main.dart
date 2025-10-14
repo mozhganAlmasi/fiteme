@@ -4,13 +4,22 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shahrzad/blocs/category/category_bloc.dart';
-import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shahrzad/feature/feature_user/data/repository/repository.dart';
+import 'package:shahrzad/feature/feature_user/domain/repository/userrepository.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/usercreate_usecase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/userdelet_usecase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/userget_usecase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/userlogin_usecase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/usersgetall_usecaase.dart';
+import 'package:shahrzad/feature/feature_user/domain/usecase/userupdate_usecase.dart';
 import 'package:shahrzad/firebase_options.dart';
 import 'package:shahrzad/pages/loginpage.dart';
 import 'blocs/internetconnection/connectivity_bloc.dart';
 import 'cubit/userinfo_cubit.dart';
+import 'feature/feature_user/data/datasource/remote/user_api_service.dart';
+import 'feature/feature_user/presentation/bloc/user/users_bloc.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,7 +38,15 @@ Future<void> main() async{
       create: (context) => ConnectivityBloc(Connectivity()),
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => UsersBloc()),
+          BlocProvider(create: (context) => UsersBloc(
+            getUsersUseCase:UsersGetAllUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)) ,
+            getUserUseCase: UserGetUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+            userCreateUseCase: UserCreateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+            userDeletUseCase: UserDeletUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+            userLoginUseCase: UserLoginUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+            userUpdateUseCase: UserUpdateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+          )
+          ),
           BlocProvider(create: (context) => UserinfoCubit()),
           BlocProvider(create: (context)=>CategoryBloc()),
         ],

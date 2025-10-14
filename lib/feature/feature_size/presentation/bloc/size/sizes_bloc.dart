@@ -17,7 +17,9 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
   final CreateSizeUseCase createSizeUseCase;
   final DeletSizeUseCase deletSizeUseCase;
 
-  SizesBloc({required this.getSizeUseCase , required this.createSizeUseCase , required this.deletSizeUseCase}) : super(SizesInitial()) {
+  SizesBloc({required this.getSizeUseCase ,
+             required this.createSizeUseCase ,
+             required this.deletSizeUseCase}) : super(SizesInitial()) {
     on<SizesEvent>((event, emit) {
       // TODO: implement event handler
     });
@@ -37,7 +39,7 @@ class SizesBloc extends Bloc<SizesEvent, SizesState> {
     on<LoadSizes>((event, emit) async {
       try {
         emit(SizeLoading());
-        List<SizeEntities> result =  await getSizeUseCase(params: event.userID);
+        List<SizeModel> result =  await getSizeUseCase(params: event.userID);
         if(result.length ==0) {
           emit(SizeEmpty());
         }else{

@@ -59,3 +59,4 @@ extension SizeModelDisplay on SizeModel {
     };
   }
 }
+

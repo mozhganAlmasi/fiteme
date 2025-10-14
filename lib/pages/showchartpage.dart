@@ -1,11 +1,16 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/size/sizes_bloc.dart';
 import '../classes/color.dart';
 import '../classes/style.dart';
-import '../models/size_model.dart';
-import '../widgets/customchartwidget.dart';
+import '../core/widgets/customchartwidget.dart';
+import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
+import '../feature/feature_size/data/model/size_model.dart';
+import '../feature/feature_size/data/repository/repository.dart';
+import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
+import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
 import 'home.dart';
 
 class ShowChartPage extends StatelessWidget {
@@ -103,7 +108,29 @@ class ShowChartPage extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (_) => BlocProvider(
                               create: (context) =>
-                                  SizesBloc()..add(SizesLoadEvent(userID)),
+                              SizesBloc(
+                                getSizeUseCase: GetSizeUseCase(
+                                  sizeRepository:
+                                  SizeRepositoryImpementation(
+                                    apiService:
+                                    SizeApiService(),
+                                  ),
+                                ),
+                                createSizeUseCase: CreateSizeUseCase(
+                                  sizeRepository:
+                                  SizeRepositoryImpementation(
+                                    apiService:
+                                    SizeApiService(),
+                                  ),
+                                ),
+                                deletSizeUseCase: DeletSizeUseCase(
+                                  sizeRepository:
+                                  SizeRepositoryImpementation(
+                                    apiService:
+                                    SizeApiService(),
+                                  ),
+                                ),
+                              )..add(LoadSizes(userID)),
                               child: HomePage(),
                             )));
               },

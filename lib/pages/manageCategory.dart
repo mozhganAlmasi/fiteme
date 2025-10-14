@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shahrzad/blocs/category/category_bloc.dart';
-import 'package:shahrzad/blocs/user/users_bloc.dart';
+import 'package:shahrzad/feature/feature_user/presentation/bloc/user/users_bloc.dart';
 import 'package:shahrzad/models/category_model.dart';
 import 'package:shahrzad/pages/addcategorydialog.dart';
 
 import '../classes/color.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../widgets/customalertdialog.dart';
+import '../core/widgets/customalertdialog.dart';
 
 class Managecategory extends StatefulWidget {
   final int coachCode;

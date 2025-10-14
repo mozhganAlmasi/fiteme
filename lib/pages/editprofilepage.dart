@@ -2,16 +2,18 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shahrzad/blocs/category/category_bloc.dart';
-import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
-import 'package:shahrzad/pages/loginpage.dart';
-import 'package:shahrzad/widgets/customalertdialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../blocs/size/sizes_bloc.dart';
+import 'package:shahrzad/core/widgets/customalertdialog.dart';
 import '../cubit/userinfo_cubit.dart';
-import '../models/user_model.dart';
-import '../widgets/contentprivacypolicywidget.dart';
+import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
+import '../feature/feature_size/data/repository/repository.dart';
+import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
+import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
+import '../feature/feature_user/data/model/usermodel.dart';
+import '../feature/feature_user/presentation/bloc/user/users_bloc.dart';
 import 'home.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -102,7 +104,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
                           create: (context) =>
-                              SizesBloc()..add(SizesLoadEvent(userID)),
+                          SizesBloc(
+                            getSizeUseCase: GetSizeUseCase(
+                              sizeRepository:
+                              SizeRepositoryImpementation(
+                                apiService:
+                                SizeApiService(),
+                              ),
+                            ),
+                            createSizeUseCase: CreateSizeUseCase(
+                              sizeRepository:
+                              SizeRepositoryImpementation(
+                                apiService:
+                                SizeApiService(),
+                              ),
+                            ),
+                            deletSizeUseCase: DeletSizeUseCase(
+                              sizeRepository:
+                              SizeRepositoryImpementation(
+                                apiService:
+                                SizeApiService(),
+                              ),
+                            ),
+                          )..add(LoadSizes(userID)),
                           child: HomePage(),
                         ),
                       ),
@@ -320,8 +344,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                         Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                             builder: (_) => BlocProvider(
-                                              create: (context) => SizesBloc()
-                                                ..add(SizesLoadEvent(userID)),
+                                              create: (context) => SizesBloc(
+                                                getSizeUseCase: GetSizeUseCase(
+                                                  sizeRepository:
+                                                  SizeRepositoryImpementation(
+                                                    apiService:
+                                                    SizeApiService(),
+                                                  ),
+                                                ),
+                                                createSizeUseCase: CreateSizeUseCase(
+                                                  sizeRepository:
+                                                  SizeRepositoryImpementation(
+                                                    apiService:
+                                                    SizeApiService(),
+                                                  ),
+                                                ),
+                                                deletSizeUseCase: DeletSizeUseCase(
+                                                  sizeRepository:
+                                                  SizeRepositoryImpementation(
+                                                    apiService:
+                                                    SizeApiService(),
+                                                  ),
+                                                ),
+                                              )..add(LoadSizes(userID)),
                                               child: HomePage(),
                                             ),
                                           ),

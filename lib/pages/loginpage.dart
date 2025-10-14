@@ -1,15 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shahrzad/blocs/size/sizes_bloc.dart';
-import 'package:shahrzad/blocs/user/users_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
 import 'package:shahrzad/pages/home.dart';
 import 'package:shahrzad/pages/registerpage.dart';
 import '../blocs/internetconnection/connectivity_bloc.dart';
 import '../cubit/userinfo_cubit.dart';
-import '../widgets/customalertdialog.dart';
+import '../core/widgets/customalertdialog.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+
+import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
+import '../feature/feature_size/data/repository/repository.dart';
+import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
+import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
+import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
+import '../feature/feature_user/data/datasource/remote/user_api_service.dart';
+import '../feature/feature_user/data/repository/repository.dart';
+import '../feature/feature_user/domain/usecase/usercreate_usecase.dart';
+import '../feature/feature_user/domain/usecase/userdelet_usecase.dart';
+import '../feature/feature_user/domain/usecase/userget_usecase.dart';
+import '../feature/feature_user/domain/usecase/userlogin_usecase.dart';
+import '../feature/feature_user/domain/usecase/usersgetall_usecaase.dart';
+import '../feature/feature_user/domain/usecase/userupdate_usecase.dart';
+import '../feature/feature_user/presentation/bloc/user/users_bloc.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -55,7 +69,29 @@ class _LoginPageState extends State<LoginPage> {
                           MaterialPageRoute(
                               builder: (_) => BlocProvider(
                                 create: (context) =>
-                                SizesBloc()..add(SizesLoadEvent(state.user.id!)),
+                                SizesBloc(
+                                  getSizeUseCase: GetSizeUseCase(
+                                    sizeRepository:
+                                    SizeRepositoryImpementation(
+                                      apiService:
+                                      SizeApiService(),
+                                    ),
+                                  ),
+                                  createSizeUseCase: CreateSizeUseCase(
+                                    sizeRepository:
+                                    SizeRepositoryImpementation(
+                                      apiService:
+                                      SizeApiService(),
+                                    ),
+                                  ),
+                                  deletSizeUseCase: DeletSizeUseCase(
+                                    sizeRepository:
+                                    SizeRepositoryImpementation(
+                                      apiService:
+                                      SizeApiService(),
+                                    ),
+                                  ),
+                                )..add(LoadSizes(state.user.id!)),
                                 child: HomePage(),
                               )),
                         );
@@ -206,7 +242,7 @@ class _LoginPageState extends State<LoginPage> {
                                       if (_formKey.currentState!.validate()) {
                                         final phone = _phoneController.text.trim();
                                         final pass = _passwordController.text.trim();
-                                        context.read<UsersBloc>().add(LoginSubmittedEvent(
+                                        context.read<UsersBloc>().add(LoginUserEvent(
                                           phoneNumber: phone,
                                           password: pass,
                                         ));
@@ -231,7 +267,7 @@ class _LoginPageState extends State<LoginPage> {
                                           if (_formKey.currentState!.validate()) {
                                             final phone = _phoneController.text.trim();
                                             final pass = _passwordController.text.trim();
-                                            context.read<UsersBloc>().add(LoginSubmittedEvent(
+                                            context.read<UsersBloc>().add(LoginUserEvent(
                                               phoneNumber: phone,
                                               password: pass,
                                             ));
@@ -264,7 +300,14 @@ class _LoginPageState extends State<LoginPage> {
                                           .pushReplacement(MaterialPageRoute(
                                               builder: (_) => BlocProvider(
                                                     create: (context) =>
-                                                        UsersBloc(),
+                                                        UsersBloc(
+                                                          getUsersUseCase:UsersGetAllUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)) ,
+                                                          getUserUseCase: UserGetUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                                                          userCreateUseCase: UserCreateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                                                          userDeletUseCase: UserDeletUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                                                          userLoginUseCase: UserLoginUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                                                          userUpdateUseCase: UserUpdateUseCase(usersRepository:UserRepositoryImplementation(apiService: UserApiService(),)),
+                                                        ),
                                                     child: RegisterPage(),
                                                   )));
                                     },

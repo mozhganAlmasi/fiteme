@@ -1,27 +1,30 @@
-class UserModel {
-  final String? id; // nullable چون زمان ثبت هنوز موجود نیست
-  final String name;
-  final String family;
-  final int groupid;
-  final int role;
-  final String email;
-  final String phonenumber;
-  final String password;
-  final bool active;
-  final int coach_code;
+import 'package:shahrzad/feature/feature_user/domain/entities/entities.dart';
 
+class UserModel extends UserEntities {
   UserModel({
-    this.id,
-    required this.name,
-    required this.family,
-    required this.groupid,
-    required this.role,
-    required this.email,
-    required this.phonenumber,
-    required this.password,
-    required this.active,
-    required this.coach_code,
-  });
+    required id,
+    required name,
+    required family,
+    required groupid,
+    required role,
+    required email,
+    required phonenumber,
+    required password,
+    required active,
+    required coach_code,
+
+  }) : super(
+         id: id,
+         name: name,
+         family: family,
+         groupid: groupid,
+         role: role,
+         email: email,
+         phonenumber: phonenumber,
+         password: password,
+         active: active,
+         coach_code: coach_code,
+       );
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
