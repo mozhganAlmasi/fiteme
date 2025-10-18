@@ -5,14 +5,13 @@ import 'package:shahrzad/feature/feature_size/domain/repository/repositories.dar
 import 'package:http/http.dart' as http;
 
 class SizeRepositoryImpementation implements SizeRepository{
-  static final String baseUrl = 'https://almaseman.ir/api/size';
   final SizeApiService apiService;
   SizeRepositoryImpementation({required this.apiService});
 
   @override
   Future<List<SizeModel>> getSize(String userID) async{
     try{
-      final response = await apiService.getUserSize(baseUrl, userID);
+      final response = await apiService.getUserSizeApi( userID);
       if (response.statusCode == 200) {
         // درخواست موفق بود
         final List data = json.decode(response.body);
@@ -31,7 +30,7 @@ class SizeRepositoryImpementation implements SizeRepository{
 
   @override
   Future<bool> deletSize(String userID, int id) async{
-     final response = await apiService.deletUserSize(baseUrl, userID, id);
+     final response = await apiService.deletUserSizeApi( userID, id);
      if (response.statusCode != 200) {
        throw Exception('Failed to delet size');
      }
@@ -40,11 +39,7 @@ class SizeRepositoryImpementation implements SizeRepository{
 
   @override
   Future<bool> createSize(SizeModel size) async{
-    final response = await http.post(
-      Uri.parse('$baseUrl/insert'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(size.toJson()), // id ارسال نمی‌شود
-    );
+    final response =await apiService.insertSizeApi(size);
     if (response.statusCode != 200) {
       throw Exception('Failed to create size');
     }

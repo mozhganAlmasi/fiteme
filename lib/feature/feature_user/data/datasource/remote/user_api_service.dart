@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:shahrzad/feature/feature_user/data/model/usermodel.dart';
-
 import '../../../../../core/constants.dart';
 
 
@@ -40,20 +38,11 @@ class UserApiService {
 
   Future<http.Response> updateUser(UserModel updatedUser) async {
     try {
-      final Map<String, dynamic> data = {
-        'id': updatedUser.id,
-        'name': updatedUser.name,
-        'family': updatedUser.family,
-        'email': updatedUser.email,
-        'groupid': updatedUser.groupid,
-        'phonenumber': updatedUser.phonenumber,
-        'password': updatedUser.password,
-        'active': updatedUser.active,
-      };
+
       final response = await http.put(
         Uri.parse('$userBaseUrl/update'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(data),
+        body: json.encode(updatedUser.toJsonForUpdate()),
       );
       return response;
     } catch (e) {

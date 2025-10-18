@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shahrzad/blocs/category/category_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shahrzad/feature/feature_user/data/repository/repository.dart';
@@ -15,9 +14,15 @@ import 'package:shahrzad/feature/feature_user/domain/usecase/userlogin_usecase.d
 import 'package:shahrzad/feature/feature_user/domain/usecase/usersgetall_usecaase.dart';
 import 'package:shahrzad/feature/feature_user/domain/usecase/userupdate_usecase.dart';
 import 'package:shahrzad/firebase_options.dart';
-import 'package:shahrzad/pages/loginpage.dart';
+import 'package:shahrzad/feature/feature_user/presentation/pages/loginpage.dart';
 import 'blocs/internetconnection/connectivity_bloc.dart';
 import 'cubit/userinfo_cubit.dart';
+import 'feature/feature_category/data/datasource/remote/category_api_services.dart';
+import 'feature/feature_category/data/repository/repository.dart';
+import 'feature/feature_category/domain/usecase/categorycreate_usecase.dart';
+import 'feature/feature_category/domain/usecase/categorydelete_usecase.dart';
+import 'feature/feature_category/domain/usecase/categoryget_usecase.dart';
+import 'feature/feature_category/presenteation/bloc/category/category_bloc.dart';
 import 'feature/feature_user/data/datasource/remote/user_api_service.dart';
 import 'feature/feature_user/presentation/bloc/user/users_bloc.dart';
 
@@ -48,7 +53,11 @@ Future<void> main() async{
           )
           ),
           BlocProvider(create: (context) => UserinfoCubit()),
-          BlocProvider(create: (context)=>CategoryBloc()),
+          BlocProvider(create: (context)=>CategoryBloc(
+              categoryCreateUseCase: CategoryCreateUseCase(CategoryRepositoryImpelementation(CateoryApiService())),
+              categoryDeletUseCase:  CategoryDeletUseCase(CategoryRepositoryImpelementation(CateoryApiService())),
+              categoryGetUseCase:CategoryGetUseCase(CategoryRepositoryImpelementation(CateoryApiService()))
+          )),
         ],
         child: const MyApp(),
       ),

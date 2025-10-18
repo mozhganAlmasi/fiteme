@@ -2,35 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shahrzad/blocs/category/category_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
-import 'package:shahrzad/feature/feature_size/domain/entities/entities.dart';
-import 'package:shahrzad/pages/addsizepage.dart';
-import 'package:shahrzad/pages/adminpage.dart';
-import 'package:shahrzad/pages/editprofilepage.dart';
-import 'package:shahrzad/pages/loginpage.dart';
-import 'package:shahrzad/pages/manageCategory.dart';
-import 'package:shahrzad/pages/showchartpage.dart';
-import '../classes/appexisthandler.dart';
-import '../cubit/userinfo_cubit.dart';
-import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
-import '../feature/feature_size/data/model/size_model.dart';
-import '../feature/feature_size/data/repository/repository.dart';
-import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
-import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
-import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
-import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
-import '../feature/feature_user/data/datasource/remote/user_api_service.dart';
-import '../feature/feature_user/data/repository/repository.dart';
-import '../feature/feature_user/domain/usecase/usercreate_usecase.dart';
-import '../feature/feature_user/domain/usecase/userdelet_usecase.dart';
-import '../feature/feature_user/domain/usecase/userget_usecase.dart';
-import '../feature/feature_user/domain/usecase/userlogin_usecase.dart';
-import '../feature/feature_user/domain/usecase/usersgetall_usecaase.dart';
-import '../feature/feature_user/domain/usecase/userupdate_usecase.dart';
-import '../feature/feature_user/presentation/bloc/user/users_bloc.dart';
-import '../core/widgets/customalertdialog.dart';
+import 'package:shahrzad/feature/feature_category/data/repository/repository.dart';
+import 'package:shahrzad/feature/feature_size/presentation/pages/addsizepage.dart';
+import 'package:shahrzad/feature/feature_user/presentation/pages/adminpage.dart';
+import 'package:shahrzad/feature/feature_user/presentation/pages/editprofilepage.dart';
+import 'package:shahrzad/feature/feature_user/presentation/pages/loginpage.dart';
+import 'package:shahrzad/feature/feature_category/presenteation/pages/manageCategory.dart';
+import 'package:shahrzad/feature/feature_size/presentation/pages/showchartpage.dart';
+import 'classes/appexisthandler.dart';
+import 'cubit/userinfo_cubit.dart';
+import 'feature/feature_category/data/datasource/remote/category_api_services.dart';
+import 'feature/feature_category/domain/repository/repository.dart';
+import 'feature/feature_category/presenteation/bloc/category/category_bloc.dart';
+import 'feature/feature_size/data/datasource/remote/size_api_service.dart';
+import 'feature/feature_size/data/model/size_model.dart';
+import 'feature/feature_size/data/repository/repository.dart';
+import 'feature/feature_size/domain/usecase/create_size_usecase.dart';
+import 'feature/feature_size/domain/usecase/delet_size_usecase.dart';
+import 'feature/feature_size/domain/usecase/get_size_usecase.dart';
+import 'feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
+import 'feature/feature_user/data/datasource/remote/user_api_service.dart';
+import 'feature/feature_user/data/repository/repository.dart';
+import 'feature/feature_user/domain/usecase/usercreate_usecase.dart';
+import 'feature/feature_user/domain/usecase/userdelet_usecase.dart';
+import 'feature/feature_user/domain/usecase/userget_usecase.dart';
+import 'feature/feature_user/domain/usecase/userlogin_usecase.dart';
+import 'feature/feature_user/domain/usecase/usersgetall_usecaase.dart';
+import 'feature/feature_user/domain/usecase/userupdate_usecase.dart';
+import 'feature/feature_user/presentation/bloc/user/users_bloc.dart';
+import 'core/widgets/customalertdialog.dart';
+import 'package:shahrzad/feature/feature_category/domain/usecase/categorycreate_usecase.dart';
+import 'package:shahrzad/feature/feature_category/domain/usecase/categorydelete_usecase.dart';
+import 'package:shahrzad/feature/feature_category/domain/usecase/categoryget_usecase.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -100,7 +105,11 @@ class _HomePageState extends State<HomePage> {
                 )..add(UserGetEvent(userID)),
               ),
               if(userRole ==2 && coachCode != 0) BlocProvider(
-                create: (context) => CategoryBloc()..add(LoadCategoryEvent(coachCode)),
+                create: (context) => CategoryBloc(
+                  categoryCreateUseCase: CategoryCreateUseCase(CategoryRepositoryImpelementation(CateoryApiService())),
+                    categoryDeletUseCase:  CategoryDeletUseCase(CategoryRepositoryImpelementation(CateoryApiService())),
+                    categoryGetUseCase:CategoryGetUseCase(CategoryRepositoryImpelementation(CateoryApiService()))
+                )..add(LoadCategoryEvent(coachCode)),
               ),
             ],
             child: EditProfilePage(),
@@ -130,7 +139,11 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (context) => CategoryBloc()..add(LoadCategoryEvent(coachCode)),
+            create: (context) =>  CategoryBloc(
+                categoryCreateUseCase: CategoryCreateUseCase(CategoryRepositoryImpelementation(CateoryApiService())),
+                categoryDeletUseCase:  CategoryDeletUseCase(CategoryRepositoryImpelementation(CateoryApiService())),
+                categoryGetUseCase:CategoryGetUseCase(CategoryRepositoryImpelementation(CateoryApiService()))
+            )..add(LoadCategoryEvent(coachCode)),
             child: Managecategory(coachCode),
           ),
         ),

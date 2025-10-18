@@ -2,28 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
-import 'package:shahrzad/pages/home.dart';
-import 'package:shahrzad/pages/registerpage.dart';
-import '../blocs/internetconnection/connectivity_bloc.dart';
-import '../cubit/userinfo_cubit.dart';
-import '../core/widgets/customalertdialog.dart';
+import 'package:shahrzad/home.dart';
+import 'package:shahrzad/feature/feature_user/presentation/pages/registerpage.dart';
+import '../../../../blocs/internetconnection/connectivity_bloc.dart';
+import '../../../../cubit/userinfo_cubit.dart';
+import '../../../../core/widgets/customalertdialog.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
-import '../feature/feature_size/data/repository/repository.dart';
-import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
-import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
-import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
-import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
-import '../feature/feature_user/data/datasource/remote/user_api_service.dart';
-import '../feature/feature_user/data/repository/repository.dart';
-import '../feature/feature_user/domain/usecase/usercreate_usecase.dart';
-import '../feature/feature_user/domain/usecase/userdelet_usecase.dart';
-import '../feature/feature_user/domain/usecase/userget_usecase.dart';
-import '../feature/feature_user/domain/usecase/userlogin_usecase.dart';
-import '../feature/feature_user/domain/usecase/usersgetall_usecaase.dart';
-import '../feature/feature_user/domain/usecase/userupdate_usecase.dart';
-import '../feature/feature_user/presentation/bloc/user/users_bloc.dart';
+import '../../../feature_size/data/datasource/remote/size_api_service.dart';
+import '../../../feature_size/data/repository/repository.dart';
+import '../../../feature_size/domain/usecase/create_size_usecase.dart';
+import '../../../feature_size/domain/usecase/delet_size_usecase.dart';
+import '../../../feature_size/domain/usecase/get_size_usecase.dart';
+import '../../../feature_size/presentation/bloc/size/sizes_bloc.dart';
+import '../../data/datasource/remote/user_api_service.dart';
+import '../../data/repository/repository.dart';
+import '../../domain/usecase/usercreate_usecase.dart';
+import '../../domain/usecase/userdelet_usecase.dart';
+import '../../domain/usecase/userget_usecase.dart';
+import '../../domain/usecase/userlogin_usecase.dart';
+import '../../domain/usecase/usersgetall_usecaase.dart';
+import '../../domain/usecase/userupdate_usecase.dart';
+import '../bloc/user/users_bloc.dart';
 
 
 class LoginPage extends StatefulWidget {

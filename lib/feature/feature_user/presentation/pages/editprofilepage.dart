@@ -1,20 +1,20 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shahrzad/blocs/category/category_bloc.dart';
 import 'package:shahrzad/classes/color.dart';
 import 'package:shahrzad/classes/style.dart';
 import 'package:shahrzad/core/widgets/customalertdialog.dart';
-import '../cubit/userinfo_cubit.dart';
-import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
-import '../feature/feature_size/data/repository/repository.dart';
-import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
-import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
-import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
-import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
-import '../feature/feature_user/data/model/usermodel.dart';
-import '../feature/feature_user/presentation/bloc/user/users_bloc.dart';
-import 'home.dart';
+import '../../../../cubit/userinfo_cubit.dart';
+import '../../../feature_category/presenteation/bloc/category/category_bloc.dart';
+import '../../../feature_size/data/datasource/remote/size_api_service.dart';
+import '../../../feature_size/data/repository/repository.dart';
+import '../../../feature_size/domain/usecase/create_size_usecase.dart';
+import '../../../feature_size/domain/usecase/delet_size_usecase.dart';
+import '../../../feature_size/domain/usecase/get_size_usecase.dart';
+import '../../../feature_size/presentation/bloc/size/sizes_bloc.dart';
+import '../../data/model/usermodel.dart';
+import '../bloc/user/users_bloc.dart';
+import '../../../../home.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});

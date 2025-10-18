@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shahrzad/blocs/category/category_bloc.dart';
-import 'package:shahrzad/pages/registerpage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../classes/style.dart';
-import 'home.dart';
+import '../../../../classes/style.dart';
+import '../../../feature_category/presenteation/bloc/category/category_bloc.dart';
 
 class CoachCodeDialogPage extends StatefulWidget {
 

@@ -52,4 +52,15 @@ class UserModel extends UserEntities {
     'active': active,
     'coach_code': coach_code,
   };
+
+  Map<String, dynamic> toJsonForUpdate() => {
+    'id': id,
+    'name': name,
+    'family': family,
+    'email': email,
+    'groupid': groupid,
+    'phonenumber': phonenumber,
+    'password': password,
+    'active': active,
+  };
 }

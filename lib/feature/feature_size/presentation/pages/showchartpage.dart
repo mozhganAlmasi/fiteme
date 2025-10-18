@@ -1,17 +1,17 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../classes/color.dart';
-import '../classes/style.dart';
-import '../core/widgets/customchartwidget.dart';
-import '../feature/feature_size/data/datasource/remote/size_api_service.dart';
-import '../feature/feature_size/data/model/size_model.dart';
-import '../feature/feature_size/data/repository/repository.dart';
-import '../feature/feature_size/domain/usecase/create_size_usecase.dart';
-import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
-import '../feature/feature_size/domain/usecase/get_size_usecase.dart';
-import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
-import 'home.dart';
+import '../../../../classes/color.dart';
+import '../../../../classes/style.dart';
+import '../../../../core/widgets/customchartwidget.dart';
+import '../../data/datasource/remote/size_api_service.dart';
+import '../../data/model/size_model.dart';
+import '../../data/repository/repository.dart';
+import '../../domain/usecase/create_size_usecase.dart';
+import '../../domain/usecase/delet_size_usecase.dart';
+import '../../domain/usecase/get_size_usecase.dart';
+import '../bloc/size/sizes_bloc.dart';
+import '../../../../home.dart';
 
 class ShowChartPage extends StatelessWidget {
   final String userID;

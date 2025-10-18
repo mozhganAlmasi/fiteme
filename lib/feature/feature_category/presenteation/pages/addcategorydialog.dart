@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../blocs/category/category_bloc.dart';
+import '../bloc/category/category_bloc.dart';
 
 class AddCategortDialog extends StatefulWidget {
   final int coachCode;

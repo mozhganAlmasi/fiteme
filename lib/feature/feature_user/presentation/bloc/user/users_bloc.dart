@@ -7,11 +7,9 @@ import 'package:shahrzad/feature/feature_user/domain/usecase/userget_usecase.dar
 import 'package:shahrzad/feature/feature_user/domain/usecase/usercreate_usecase.dart';
 import 'package:shahrzad/feature/feature_user/domain/usecase/userlogin_usecase.dart';
 import 'package:shahrzad/feature/feature_user/domain/usecase/userupdate_usecase.dart';
-
 import '../../../domain/usecase/usersgetall_usecaase.dart';
 
 part 'users_event.dart';
-
 part 'users_state.dart';
 
 class UsersBloc extends Bloc<UsersEvent, UsersState> {

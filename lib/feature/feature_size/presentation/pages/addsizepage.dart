@@ -10,12 +10,12 @@ import 'package:shahrzad/feature/feature_size/data/repository/repository.dart';
 import 'package:shahrzad/feature/feature_size/domain/usecase/create_size_usecase.dart';
 import 'package:shahrzad/feature/feature_size/domain/usecase/get_size_usecase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../core/widgets/contentprivacypolicywidget.dart';
-import '../core/widgets/persiandatepicker.dart';
-import '../feature/feature_size/data/model/size_model.dart';
-import '../feature/feature_size/domain/usecase/delet_size_usecase.dart';
-import '../feature/feature_size/presentation/bloc/size/sizes_bloc.dart';
-import 'home.dart';
+import '../../../../core/widgets/contentprivacypolicywidget.dart';
+import '../../../../core/widgets/persiandatepicker.dart';
+import '../../data/model/size_model.dart';
+import '../../domain/usecase/delet_size_usecase.dart';
+import '../bloc/size/sizes_bloc.dart';
+import '../../../../home.dart';
 
 class AddsizePage extends StatefulWidget {
   final String userID;
@@ -279,44 +279,44 @@ class _AddsizePageState extends State<AddsizePage> {
                                           ),
                                         ),
                                         onPressed: () async {
-                                          bool isValid = _formKey.currentState!
+                                          try{ bool isValid = _formKey.currentState!
                                               .validate();
                                           setState(() {
                                             fieldErrors = [
                                               waistController.text.isEmpty ||
                                                   double.tryParse(
-                                                        waistController.text,
-                                                      ) ==
+                                                    waistController.text,
+                                                  ) ==
                                                       null,
                                               chestController.text.isEmpty ||
                                                   double.tryParse(
-                                                        chestController.text,
-                                                      ) ==
+                                                    chestController.text,
+                                                  ) ==
                                                       null,
                                               hipsController.text.isEmpty ||
                                                   double.tryParse(
-                                                        hipsController.text,
-                                                      ) ==
+                                                    hipsController.text,
+                                                  ) ==
                                                       null,
                                               armController.text.isEmpty ||
                                                   double.tryParse(
-                                                        armController.text,
-                                                      ) ==
+                                                    armController.text,
+                                                  ) ==
                                                       null,
                                               thighController.text.isEmpty ||
                                                   double.tryParse(
-                                                        thighController.text,
-                                                      ) ==
+                                                    thighController.text,
+                                                  ) ==
                                                       null,
                                               shoulderController.text.isEmpty ||
                                                   double.tryParse(
-                                                        shoulderController.text,
-                                                      ) ==
+                                                    shoulderController.text,
+                                                  ) ==
                                                       null,
                                               bellyController.text.isEmpty ||
                                                   double.tryParse(
-                                                        bellyController.text,
-                                                      ) ==
+                                                    bellyController.text,
+                                                  ) ==
                                                       null,
                                             ];
                                           });
@@ -346,7 +346,7 @@ class _AddsizePageState extends State<AddsizePage> {
                                                 bellyController.text,
                                               ),
                                               dateInsert:
-                                                  selectedYear.toString() +
+                                              selectedYear.toString() +
                                                   "/" +
                                                   selectedMonth,
                                               userId: widget
@@ -356,6 +356,11 @@ class _AddsizePageState extends State<AddsizePage> {
                                               CreateSize(size),
                                             );
                                           }
+
+                                          }catch(e){
+                                            print(e);
+                                          }
+
                                         },
                                         child: Text(
                                           "ذخیره",
